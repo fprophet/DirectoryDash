@@ -1,4 +1,6 @@
-﻿using System.Configuration;
+﻿using DirectoryDash.Helpers;
+using DirectoryDash.ViewModels;
+using System.Configuration;
 using System.Data;
 using System.Drawing;
 using System.Windows;
@@ -14,6 +16,12 @@ namespace DirectoryDash
         private NotifyIcon _icon;
         protected override void OnStartup(StartupEventArgs e)
         {
+
+            SettingsHelper.CheckSettings();
+            MainWindow window = new MainWindow();
+            window.DataContext = new MainViewModel(new Services.ExplorerService());
+            window.Show();
+
             NotifyIcon _icon = new NotifyIcon();
             _icon.Icon = new Icon("tray.ico");
             _icon.Visible = true;
