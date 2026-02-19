@@ -3,15 +3,92 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:local="clr-namespace:DirectoryDash"
+        xmlns:converters="clr-namespace:DirectoryDash.Converters"
         mc:Ignorable="d"
         Background="Transparent"
         WindowState="Maximized"
+        Topmost="True"
         WindowStyle="None"
         AllowsTransparency="True"
         ShowInTaskbar="False"
         Title="MainWindow" Height="450" Width="800">
+    <Window.Resources>
+        <converters:ContainerLinkConverter x:Key="ContainerLinkConverter" />
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+    </Window.Resources>
     <Grid>
+        <Canvas HorizontalAlignment="Stretch"
+                Visibility="{Binding IsListVisible, Converter={StaticResource BoolToVis}}">
+            <ItemsControl ItemsSource="{Binding ContainerViewModels}" 
+                          VerticalAlignment="Bottom" >
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas Background="Transparent" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
 
+                <ItemsControl.ItemContainerStyle>
+                    <Style TargetType="ContentPresenter">
+                        <Setter Property="Canvas.Left" Value="{Binding XCoord}" />
+                        <Setter Property="Canvas.Top" Value="{Binding YCoord}" />
+                    </Style>
+                </ItemsControl.ItemContainerStyle>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <ScrollViewer  VerticalScrollBarVisibility="Auto" x:Name="ParentContainer"
+                            MaxHeight="{Binding DataContext.ParentListMaxHeight, RelativeSource={RelativeSource AncestorType=Window}}"
+                            MaxWidth="{Binding DataContext.ParentListMaxWidth, RelativeSource={RelativeSource AncestorType=Window}}" 
+                            Width="{Binding Width}" Height="{Binding Height}"
+                            Canvas.Left="{Binding XCoord, UpdateSourceTrigger=PropertyChanged}" 
+                            Canvas.Top="{Binding YCoord, UpdateSourceTrigger=PropertyChanged}">
+
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="MouseLeave">
+                                    <i:InvokeCommandAction Command="{Binding OnMouseLeave}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                            
+                            <Border Background="#2D2D2D" 
+                                CornerRadius="8" 
+                                Padding="10" 
+                                BorderBrush="#444444"
+                                BorderThickness="1">
+
+                                <Border.Effect>
+                                    <DropShadowEffect BlurRadius="15" Direction="270" Opacity="0.3" ShadowDepth="2"/>
+                                </Border.Effect>
+
+                                <ItemsControl ItemsSource="{Binding Items}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid>
+                                                <i:Interaction.Triggers>
+                                                    <i:EventTrigger EventName="MouseLeftButtonDown">
+                                                        <i:InvokeCommandAction Command="{Binding DataContext.OnContainerClickCommand, RelativeSource={RelativeSource AncestorType=Window}}">
+                                                            <i:InvokeCommandAction.CommandParameter>
+                                                                <MultiBinding Converter="{StaticResource ContainerLinkConverter}">
+                                                                    <Binding />
+                                                                    <Binding Path="DataContext" RelativeSource="{RelativeSource AncestorType=ItemsControl}"/>
+                                                                </MultiBinding>
+                                                            </i:InvokeCommandAction.CommandParameter>
+                                                        </i:InvokeCommandAction>
+                                                    </i:EventTrigger>
+                                                </i:Interaction.Triggers>
+                                                <TextBlock Text="{Binding Name}" 
+                                                Foreground="#E0E0E0" 
+                                                FontSize="13" 
+                                                Margin="2"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Border>
+                        </ScrollViewer>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Canvas>
     </Grid>
 </Window>
