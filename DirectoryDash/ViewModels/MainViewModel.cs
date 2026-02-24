@@ -24,16 +24,15 @@ namespace DirectoryDash.ViewModels
         private ExplorerService _explorerService;
 
         [ObservableProperty]
-        private int canvaX;
-        [ObservableProperty]
-        private int canvaY;
-        [ObservableProperty]
         private bool isListVisible = false;
         [ObservableProperty]
         private int parentListMaxHeight = 200;
         [ObservableProperty]
         private int parentListMaxWidth = 400;
-        private bool _iconClicked;
+        [ObservableProperty]
+        private int currentIndex = 0;
+
+
 
         public ICommand OnContainerClickCommand => new RelayCommand<object>(OnContainerClick);
         public ICommand OnMouseLeaveCommand => new AsyncRelayCommand(OnMouseLeave);
@@ -95,14 +94,39 @@ namespace DirectoryDash.ViewModels
 
         private void CreateContainerNode(ContainerViewModel sender, List<ExplorerItem> items)
         {
+            if( sender.Index < CurrentIndex)
+                ClearFromIndex(sender.Index);
+
+            var nextIndex = ContainerViewModels.Count;
+            ClearContainersWithIndex(nextIndex);
+
             ContainerViewModel containerViewModel = new ContainerViewModel(_explorerService, _iconService);
-            containerViewModel.XCoord = sender.XCoord - sender.Width;
-            containerViewModel.YCoord = sender.YCoord - (sender.Height / 2);
+            containerViewModel.XCoord = sender.XCoord - sender.Width - 20;
+            containerViewModel.YCoord = sender.YCoord;
             foreach (var item in items)
             {
                 containerViewModel.Items.Add(item);
             }
+            CurrentIndex = containerViewModel.Index = nextIndex;
             ContainerViewModels.Add(containerViewModel);
+        }
+
+        private void ClearContainersWithIndex(int nextIndex)
+        {
+            var containers = ContainerViewModels.Where(x => x.Index > nextIndex).ToList();
+            foreach (var container in containers)
+            {
+                ContainerViewModels.Remove(container);
+            }
+        }
+
+        private void ClearFromIndex(int index)
+        {
+            var containers = ContainerViewModels.Where(x => x.Index > index).ToList();
+            foreach (var container in containers)
+            {
+                ContainerViewModels.Remove(container);
+            }
         }
 
         private void SetSubscribers()
@@ -120,18 +144,15 @@ namespace DirectoryDash.ViewModels
         private void IconService_HandleClick(object? sender, EventArgs e)
         {
             
-            _iconClicked = true;
-            //CanvaX = _iconService.IconX - ParentListMaxWidth - 20;
-            //CanvaY = _iconService.IconY - ParentListMaxHeight - 20;
             CreateRootContainer();
             var rootContainer = ContainerViewModels.FirstOrDefault();
             if (rootContainer == null) return;
 
-            CanvaX = rootContainer.XCoord = _iconService.IconX - rootContainer.Width - 20;
-            CanvaY = rootContainer.YCoord = _iconService.IconY - rootContainer.Height - 20;
+            CurrentIndex = rootContainer.Index = 0;
+            rootContainer.XCoord = _iconService.IconX - rootContainer.Width - 20;
+            rootContainer.YCoord = _iconService.IconY - rootContainer.Height - 20;
 
             IsListVisible = true;
-            //_iconClicked = false;
         }
     }
 }

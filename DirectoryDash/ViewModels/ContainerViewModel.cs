@@ -29,6 +29,9 @@ namespace DirectoryDash.ViewModels
         [ObservableProperty]
         private string elementName;
 
+        [ObservableProperty]
+        private int index = 0;
+
 
         public ContainerViewModel(ExplorerService explorerService, IconService iconService)
         {
