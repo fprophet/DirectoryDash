@@ -9,6 +9,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace DirectoryDash.ViewModels
@@ -32,20 +33,26 @@ namespace DirectoryDash.ViewModels
         private int parentListMaxHeight = 200;
         [ObservableProperty]
         private int parentListMaxWidth = 400;
+        private bool _iconClicked;
 
         public ICommand OnContainerClickCommand => new RelayCommand<object>(OnContainerClick);
+        public ICommand OnMouseLeaveCommand => new AsyncRelayCommand(OnMouseLeave);
+        public ICommand OnMouseEnterCommand => new AsyncRelayCommand(OnMouseEnter);
+
         public MainViewModel(ExplorerService explorerService, IconService iconService)
         {
             _iconService = iconService;
             _explorerService = explorerService;
 
             SetSubscribers();
+        }
 
+        private void CreateRootContainer()
+        {
             var sourceDirectory = SettingsHelper.Settings.SourcePath;
             var rootNodes = _explorerService.GetNodes(sourceDirectory);
 
-            ContainerViewModel rootContainer = new ContainerViewModel(explorerService, iconService);
-            rootContainer.ElementName = "CONTAINER_1";
+            ContainerViewModel rootContainer = new ContainerViewModel(_explorerService, _iconService);
 
             foreach (var node in rootNodes)
             {
@@ -62,8 +69,28 @@ namespace DirectoryDash.ViewModels
 
             if (parameters[0] is not ExplorerItem item || parameters[1] is not ContainerViewModel containerViewModel) return;
 
-            var items = _explorerService.GetNodes(item.FullPath);
-            CreateContainerNode(containerViewModel, items);
+            if (item.IsDirectory)
+            {
+                var items = _explorerService.GetNodes(item.FullPath);
+                CreateContainerNode(containerViewModel, items);
+            }
+            else
+            {
+                _explorerService.OpenFile(item.FullPath);
+            }
+        }
+
+        private async Task OnMouseLeave() => await _explorerService.StartClear();
+
+        private async Task OnMouseEnter() => await _explorerService.CancelClear();
+
+        private void ClearContainers()
+        {
+            foreach (var container in ContainerViewModels)
+            {
+                container.Items.Clear();
+            }
+             ContainerViewModels.Clear();
         }
 
         private void CreateContainerNode(ContainerViewModel sender, List<ExplorerItem> items)
@@ -71,7 +98,6 @@ namespace DirectoryDash.ViewModels
             ContainerViewModel containerViewModel = new ContainerViewModel(_explorerService, _iconService);
             containerViewModel.XCoord = sender.XCoord - sender.Width;
             containerViewModel.YCoord = sender.YCoord - (sender.Height / 2);
-            containerViewModel.ElementName = "CONTAINER_" + ContainerViewModels.Count;
             foreach (var item in items)
             {
                 containerViewModel.Items.Add(item);
@@ -81,19 +107,31 @@ namespace DirectoryDash.ViewModels
 
         private void SetSubscribers()
         {
-            _iconService.IconClick += (s, e) =>
-            {
-                //CanvaX = _iconService.IconX - ParentListMaxWidth - 20;
-                //CanvaY = _iconService.IconY - ParentListMaxHeight - 20;
+            _iconService.IconClick += IconService_HandleClick;
+            _explorerService.Clear += ClearView;
+        }
 
-                var rootContainer = ContainerViewModels.FirstOrDefault();
-                if (rootContainer == null) return;
+        private void ClearView()
+        {
+            ClearContainers();
+            IsListVisible = false;
+        }
 
-                rootContainer.XCoord = _iconService.IconX - rootContainer.Width - 20;
-                rootContainer.YCoord = _iconService.IconY - rootContainer.Height - 20;
+        private void IconService_HandleClick(object? sender, EventArgs e)
+        {
+            
+            _iconClicked = true;
+            //CanvaX = _iconService.IconX - ParentListMaxWidth - 20;
+            //CanvaY = _iconService.IconY - ParentListMaxHeight - 20;
+            CreateRootContainer();
+            var rootContainer = ContainerViewModels.FirstOrDefault();
+            if (rootContainer == null) return;
 
-                IsListVisible = true;
-            };
+            CanvaX = rootContainer.XCoord = _iconService.IconX - rootContainer.Width - 20;
+            CanvaY = rootContainer.YCoord = _iconService.IconY - rootContainer.Height - 20;
+
+            IsListVisible = true;
+            //_iconClicked = false;
         }
     }
 }

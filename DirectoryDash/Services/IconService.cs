@@ -11,7 +11,6 @@ namespace DirectoryDash.Services
     {
         public event EventHandler IconClick;
 
-
         private NotifyIcon _icon;
 
         public int IconX { get; private set; }
@@ -23,7 +22,6 @@ namespace DirectoryDash.Services
             _icon.Icon = new Icon("tray.ico");
             _icon.Visible = true;
             _icon.Click += HandleClick;
-            _icon.MouseClick += HandleClick;
             _icon.ContextMenuStrip = new ContextMenuStrip();
             _icon.ContextMenuStrip.Items.Add("Settings", null);
             _icon.ContextMenuStrip.Items.Add("-", null);
@@ -38,11 +36,7 @@ namespace DirectoryDash.Services
 
         private void HandleClick(object? sender, EventArgs e)
         {
-            var (x,y) = GetCurrentMousePosition();
-            IconX = x;
-            IconY = y;
 
-            OnIconClick();
 
             var icon = sender as NotifyIcon;
             if (e is MouseEventArgs mouseEventArgs && mouseEventArgs.Button == MouseButtons.Right)
@@ -51,7 +45,20 @@ namespace DirectoryDash.Services
             }
             else
             {
-                //System.Windows.MessageBox.Show("Balloon tip clicked!");
+                MainWindow mainWindow = (MainWindow)System.Windows.Application.Current.MainWindow;
+                if (mainWindow != null)
+                {
+                    mainWindow.Show();
+                    mainWindow.Activate();
+                    mainWindow.Focus();
+                }
+
+
+                var (x, y) = GetCurrentMousePosition();
+                IconX = x;
+                IconY = y;
+
+                OnIconClick();
             }
         }
 

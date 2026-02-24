@@ -11,6 +11,10 @@ namespace DirectoryDash.Services
 {
     internal class ExplorerService
     {
+        public Action Clear { get; internal set; }
+
+        private CancellationTokenSource _clearViewCT = new CancellationTokenSource();
+
         public List<ExplorerItem> GetNodes(string path)
         {
             try
@@ -37,5 +41,28 @@ namespace DirectoryDash.Services
                 return new List<ExplorerItem>();
             }
         }
+
+        internal void OpenFile(string fullPath)
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = fullPath,
+                UseShellExecute = true
+            });
+        }
+
+        internal async Task StartClear()
+        {
+            try
+            {
+                _clearViewCT = new CancellationTokenSource();
+                await Task.Delay(2000, _clearViewCT.Token);
+                if (!_clearViewCT.IsCancellationRequested)
+                    Clear?.Invoke();
+            }
+            catch (TaskCanceledException) { }
+        }
+
+        internal async Task CancelClear() => _clearViewCT.Cancel();
     }
 }

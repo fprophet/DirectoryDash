@@ -21,6 +21,7 @@
     <Grid>
         <Canvas HorizontalAlignment="Stretch"
                 Visibility="{Binding IsListVisible, Converter={StaticResource BoolToVis}}">
+
             <ItemsControl ItemsSource="{Binding ContainerViewModels}" 
                           VerticalAlignment="Bottom" >
                 <ItemsControl.ItemsPanel>
@@ -28,7 +29,17 @@
                         <Canvas Background="Transparent" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
-
+                
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseLeave">
+                        <i:InvokeCommandAction Command="{Binding OnMouseLeaveCommand}" />
+                    </i:EventTrigger>
+                    
+                    <i:EventTrigger EventName="MouseEnter">
+                        <i:InvokeCommandAction Command="{Binding OnMouseEnterCommand}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                
                 <ItemsControl.ItemContainerStyle>
                     <Style TargetType="ContentPresenter">
                         <Setter Property="Canvas.Left" Value="{Binding XCoord}" />
@@ -44,12 +55,6 @@
                             Canvas.Left="{Binding XCoord, UpdateSourceTrigger=PropertyChanged}" 
                             Canvas.Top="{Binding YCoord, UpdateSourceTrigger=PropertyChanged}">
 
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="MouseLeave">
-                                    <i:InvokeCommandAction Command="{Binding OnMouseLeave}" />
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-                            
                             <Border Background="#2D2D2D" 
                                 CornerRadius="8" 
                                 Padding="10" 
@@ -60,7 +65,8 @@
                                     <DropShadowEffect BlurRadius="15" Direction="270" Opacity="0.3" ShadowDepth="2"/>
                                 </Border.Effect>
 
-                                <ItemsControl ItemsSource="{Binding Items}">
+                                <ItemsControl ItemsSource="{Binding Items}" >
+                                    
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
                                             <Grid>
