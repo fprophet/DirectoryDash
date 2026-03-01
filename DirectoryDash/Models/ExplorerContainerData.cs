@@ -8,15 +8,15 @@ using System.Threading.Tasks;
 
 namespace DirectoryDash.Models
 {
-    internal partial class ExplorerContainer : ObservableObject
+    internal partial class ExplorerContainerData : ObservableObject
     {
         public ObservableCollection<ExplorerItem> Items { get; set; } = new ObservableCollection<ExplorerItem>();
 
         [ObservableProperty]
-        private int xCoord;
+        private double xCoord;
 
         [ObservableProperty]
-        private int yCoord;
+        private double yCoord;
 
         [ObservableProperty]
         private int width = 200;

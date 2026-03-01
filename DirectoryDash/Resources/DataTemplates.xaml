@@ -1,0 +1,84 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+                    xmlns:vm="clr-namespace:DirectoryDash.ViewModels"
+                    xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
+                    xmlns:converters="clr-namespace:DirectoryDash.Converters"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    
+    <converters:ContainerLinkConverter x:Key="ContainerLinkConverter" />
+    <BooleanToVisibilityConverter x:Key="BoolToVis" />
+    
+    <DataTemplate x:Key="ContainerTemplate">
+        <Grid>
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="MouseLeftButtonDown">
+                    <i:InvokeCommandAction 
+                        CommandParameter="{Binding}"
+                        Command="{Binding DataContext.OnContainerClickCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"/>
+
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+            <StackPanel Orientation="Horizontal">
+                <Image Source="{Binding Icon}" Width="20" Height="20" Margin="2" />
+                <TextBlock Text="{Binding Name}" 
+                    Foreground="#E0E0E0" 
+                    FontSize="13" 
+                    Margin="2"/>
+            </StackPanel>
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:ContainerViewModel}">
+
+            <Border Background="#2D2D2D" 
+            CornerRadius="3" 
+            Padding="10" 
+            BorderBrush="#444444"
+            BorderThickness="1">
+
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="15" Direction="270" Opacity="0.3" ShadowDepth="2"/>
+                </Border.Effect>
+                <Grid>
+
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Border >
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Button Style="{StaticResource MaterialDesignToolButton}"
+                                Command="{Binding OpenInExplorerCommand}"
+                                HorizontalAlignment="Left" ToolTip="Open in Explorer">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
+                                        <material:PackIcon Kind="OpenInNew" Foreground="White" VerticalAlignment="Bottom"/>
+                                        <TextBlock Text="{Binding ContainerData.ElementName}" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                    </StackPanel>
+                                </Button>
+                                <Button Style="{StaticResource MaterialDesignToolButton}"
+                                        Command="{Binding UnregisterContainerCommand}"
+                                        Grid.Column="1" HorizontalAlignment="Right"
+                                    ToolTip="Close">
+                                    <material:PackIcon Kind="Close" Foreground="Red"/>
+                                </Button>
+                            </Grid>
+                        </Border>
+                        <Separator Grid.Row="1" Background="White" Height="0.5"/>
+                        <ScrollViewer  VerticalScrollBarVisibility="Auto" x:Name="ParentContainer" Grid.Row="2"
+                                MaxHeight="{Binding DataContext.ParentListMaxHeight, RelativeSource={RelativeSource AncestorType=Window}}"
+                                MaxWidth="{Binding DataContext.ParentListMaxWidth, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                Width="{Binding ContainerData.Width}" Height="{Binding ContainerData.Height}">
+                            <ItemsControl ItemsSource="{Binding ContainerData.Items}" ItemTemplate="{StaticResource ContainerTemplate}" />
+                        </ScrollViewer>
+                    </Grid>
+                </Grid>
+            </Border>
+    </DataTemplate>
+</ResourceDictionary>

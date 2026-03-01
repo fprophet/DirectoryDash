@@ -7,6 +7,7 @@
         xmlns:local="clr-namespace:DirectoryDash"
         xmlns:converters="clr-namespace:DirectoryDash.Converters"
         xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
+                    xmlns:vm="clr-namespace:DirectoryDash.ViewModels"
         mc:Ignorable="d"
         Background="Transparent"
         WindowState="Maximized"
@@ -16,118 +17,52 @@
         ShowInTaskbar="False"
         Title="MainWindow" Height="450" Width="800">
     <Window.Resources>
-        <converters:ContainerLinkConverter x:Key="ContainerLinkConverter" />
-        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Resources/DataTemplates.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <Style x:Key="ContainerCanvasStyle" TargetType="ContentControl">
+                <Setter Property="Canvas.Left" Value="{Binding ContainerData.XCoord}" />
+                <Setter Property="Canvas.Top" Value="{Binding ContainerData.YCoord}" />
+            </Style>
+        </ResourceDictionary>
     </Window.Resources>
     <Grid>
         <Canvas HorizontalAlignment="Stretch"
                 Visibility="{Binding IsListVisible, Converter={StaticResource BoolToVis}}">
 
-            <ItemsControl ItemsSource="{Binding ContainerViewModels}" 
-                          VerticalAlignment="Bottom" >
+            <ItemsControl ItemsSource="{Binding ContainersStore.AllContainers}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <Canvas Background="Transparent" />
+                        <Canvas />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
-                
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="MouseLeave">
-                        <i:InvokeCommandAction Command="{Binding OnMouseLeaveCommand}" />
-                    </i:EventTrigger>
-                    
-                    <i:EventTrigger EventName="MouseEnter">
-                        <i:InvokeCommandAction Command="{Binding OnMouseEnterCommand}" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-                
+
                 <ItemsControl.ItemContainerStyle>
                     <Style TargetType="ContentPresenter">
                         <Setter Property="Canvas.Left" Value="{Binding ContainerData.XCoord}" />
                         <Setter Property="Canvas.Top" Value="{Binding ContainerData.YCoord}" />
                     </Style>
                 </ItemsControl.ItemContainerStyle>
+                
                 <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-
-
-                            <Border Background="#2D2D2D" 
-                                CornerRadius="3" 
-                                Padding="10" 
-                                BorderBrush="#444444"
-                                BorderThickness="1">
-
-                                <Border.Effect>
-                                    <DropShadowEffect BlurRadius="15" Direction="270" Opacity="0.3" ShadowDepth="2"/>
-                                </Border.Effect>
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="*"/>
-                                    </Grid.RowDefinitions>
-
-                                    <Border >
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="*"/>
-                                            </Grid.ColumnDefinitions>
-                                            <Button Style="{StaticResource MaterialDesignToolButton}"
-                                                    Command="{Binding OpenInExplorerCommand}"
-                                                    HorizontalAlignment="Left" ToolTip="Open in Explorer">
-                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
-                                                    <material:PackIcon Kind="OpenInNew" Foreground="White" VerticalAlignment="Bottom"/>
-                                                    <TextBlock Text="{Binding ContainerData.ElementName}" VerticalAlignment="Center" Margin="10,0,0,0"/>
-                                                </StackPanel>
-                                            </Button>
-                                            <Button Style="{StaticResource MaterialDesignToolButton}" Grid.Column="1" HorizontalAlignment="Right"
-                                                ToolTip="Close">
-                                                <material:PackIcon Kind="Close" Foreground="Red"/>
-                                            </Button>
-                                        </Grid>
-                                    </Border>
-                                <Separator Grid.Row="1" Background="White" Height="0.5"/>
-                                <ScrollViewer  VerticalScrollBarVisibility="Auto" x:Name="ParentContainer" Grid.Row="2"
-                                    MaxHeight="{Binding DataContext.ParentListMaxHeight, RelativeSource={RelativeSource AncestorType=Window}}"
-                                    MaxWidth="{Binding DataContext.ParentListMaxWidth, RelativeSource={RelativeSource AncestorType=Window}}" 
-                                    Width="{Binding ContainerData.Width}" Height="{Binding ContainerData.Height}"
-                                    Canvas.Left="{Binding ContainerData.XCoord, UpdateSourceTrigger=PropertyChanged}" 
-                                    Canvas.Top="{Binding ContainerData.YCoord, UpdateSourceTrigger=PropertyChanged}">
-                                    <ItemsControl ItemsSource="{Binding ContainerData.Items}" >
-
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <Grid>
-                                                    <i:Interaction.Triggers>
-                                                        <i:EventTrigger EventName="MouseLeftButtonDown">
-                                                            <i:InvokeCommandAction Command="{Binding DataContext.OnContainerClickCommand, RelativeSource={RelativeSource AncestorType=Window}}">
-                                                                <i:InvokeCommandAction.CommandParameter>
-                                                                    <MultiBinding Converter="{StaticResource ContainerLinkConverter}">
-                                                                        <Binding />
-                                                                        <Binding Path="DataContext" RelativeSource="{RelativeSource AncestorType=ItemsControl}"/>
-                                                                    </MultiBinding>
-                                                                </i:InvokeCommandAction.CommandParameter>
-                                                            </i:InvokeCommandAction>
-                                                        </i:EventTrigger>
-                                                    </i:Interaction.Triggers>
-                                                    <StackPanel Orientation="Horizontal">
-                                                        <Image Source="{Binding Icon}" Width="20" Height="20" Margin="2" />
-                                                        <TextBlock Text="{Binding Name}" 
-                                                        Foreground="#E0E0E0" 
-                                                        FontSize="13" 
-                                                        Margin="2"/>
-                                                    </StackPanel>
-                                                </Grid>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
-                                </ScrollViewer>
-                            </Grid>
-                            </Border>
+                    <DataTemplate DataType="{x:Type vm:ContainerViewModel}">
+                        <ContentControl Content="{Binding}"
+                            Canvas.Left="{Binding ContainerData.XCoord, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             Canvas.Top="{Binding ContainerData.YCoord, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="MouseLeave">
+                                    <i:InvokeCommandAction Command="{Binding DataContext.OnMouseLeaveCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="MouseEnter">
+                                    <i:InvokeCommandAction Command="{Binding DataContext.OnMouseEnterCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </ContentControl>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
+
         </Canvas>
     </Grid>
 </Window>

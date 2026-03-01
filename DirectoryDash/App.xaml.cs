@@ -1,5 +1,6 @@
 ﻿using DirectoryDash.Helpers;
 using DirectoryDash.Services;
+using DirectoryDash.Stores;
 using DirectoryDash.ViewModels;
 using System.Configuration;
 using System.Data;
@@ -21,7 +22,8 @@ namespace DirectoryDash
             MainWindow window = new MainWindow();
             var iconService = new Services.IconService();
             var explorerService = new Services.ExplorerService();
-            window.DataContext = new MainViewModel(explorerService, iconService);
+            var store = new ContainersStore();
+            window.DataContext = new MainViewModel(explorerService, iconService, store);
             window.Show();
 
 

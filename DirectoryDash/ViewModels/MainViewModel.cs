@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using DirectoryDash.Helpers;
 using DirectoryDash.Models;
 using DirectoryDash.Services;
+using DirectoryDash.Stores;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -18,12 +19,16 @@ namespace DirectoryDash.ViewModels
 
     internal partial class MainViewModel : BaseViewModel
     {
-        public ObservableCollection<ContainerViewModel> ContainerViewModels { get; set; } = new ObservableCollection<ContainerViewModel>();
+        [ObservableProperty]
+        private ContainerViewModel rootContainer;
 
         private string title;
         private IconService _iconService;
         private ExplorerService _explorerService;
 
+        public ContainersStore ContainersStore { get; }
+
+        private ContainersStore _containersStore;
         [ObservableProperty]
         private bool isListVisible = false;
         [ObservableProperty]
@@ -33,15 +38,15 @@ namespace DirectoryDash.ViewModels
         [ObservableProperty]
         private int currentIndex = 0;
 
-
-        public ICommand OnContainerClickCommand => new RelayCommand<object>(OnContainerClick);
         public ICommand OnMouseLeaveCommand => new AsyncRelayCommand(OnMouseLeave);
         public ICommand OnMouseEnterCommand => new AsyncRelayCommand(OnMouseEnter);
 
-        public MainViewModel(ExplorerService explorerService, IconService iconService)
+        public MainViewModel(ExplorerService explorerService, IconService iconService, ContainersStore containersStore)
         {
             _iconService = iconService;
             _explorerService = explorerService;
+            ContainersStore = containersStore;
+
 
             SetSubscribers();
         }
@@ -51,87 +56,23 @@ namespace DirectoryDash.ViewModels
             var sourceDirectory = SettingsHelper.Settings.SourcePath;
             var rootNodes = _explorerService.GetNodes(sourceDirectory);
 
-            ContainerViewModel rootContainer = new ContainerViewModel(_explorerService, _iconService);
+            ContainerViewModel rootContainerVm = new ContainerViewModel(_explorerService, _iconService, ContainersStore);
 
             foreach (var node in rootNodes)
             {
-                rootContainer.ContainerData.Items.Add(node);
+                rootContainerVm.ContainerData.Items.Add(node);
             }
-            rootContainer.ContainerData.ElementName = Path.GetFileName(SettingsHelper.Settings.SourcePath);
-            rootContainer.ContainerData.ElementPath = SettingsHelper.Settings.SourcePath;
-            ContainerViewModels.Add(rootContainer);
-        }
+            rootContainerVm.ContainerData.ElementName = Path.GetFileName(SettingsHelper.Settings.SourcePath);
+            rootContainerVm.ContainerData.ElementPath = SettingsHelper.Settings.SourcePath;
 
-        [RelayCommand]
-        private void OnContainerClick(object sender)
-        {
-            if (sender is not object[] parameters || parameters.Length != 2) return;
-
-            if (parameters[0] is not ExplorerItem item || parameters[1] is not ContainerViewModel containerViewModel) return;
-
-            if (item.IsDirectory)
-            {
-                var items = _explorerService.GetNodes(item.FullPath);
-                CreateContainerNode(containerViewModel, items, item.FullPath);
-            }
-            else
-            {
-                _explorerService.OpenFile(item.FullPath);
-            }
+            RootContainer = rootContainerVm;
         }
 
         private async Task OnMouseLeave() => await _explorerService.StartClear();
 
         private async Task OnMouseEnter() => await _explorerService.CancelClear();
 
-        private void ClearContainers()
-        {
-            foreach (var containerVm in ContainerViewModels)
-            {
-                containerVm.ContainerData.Items.Clear();
-            }
-             ContainerViewModels.Clear();
-        }
-
-        private void CreateContainerNode(ContainerViewModel sender, List<ExplorerItem> items, string nodePath)
-        {
-            if( sender.ContainerData.Index < CurrentIndex)
-                ClearFromIndex(sender.ContainerData.Index);
-
-            var nextIndex = ContainerViewModels.Count;
-            ClearContainersWithIndex(nextIndex);
-
-            ContainerViewModel containerViewModel = new ContainerViewModel(_explorerService, _iconService);
-            containerViewModel.ContainerData.ElementName = Path.GetFileName(nodePath);
-            containerViewModel.ContainerData.ElementPath = nodePath;
-            containerViewModel.ContainerData.XCoord = sender.ContainerData.XCoord - sender.ContainerData.Width - 20;
-            containerViewModel.ContainerData.YCoord = sender.ContainerData.YCoord;
-
-            foreach (var item in items)
-            {
-                containerViewModel.ContainerData.Items.Add(item);
-            }
-            CurrentIndex = containerViewModel.ContainerData.Index = nextIndex;
-            ContainerViewModels.Add(containerViewModel);
-        }
-
-        private void ClearContainersWithIndex(int nextIndex)
-        {
-            var containers = ContainerViewModels.Where(x => x.ContainerData.Index > nextIndex).ToList();
-            foreach (var container in containers)
-            {
-                ContainerViewModels.Remove(container);
-            }
-        }
-
-        private void ClearFromIndex(int index)
-        {
-            var containers = ContainerViewModels.Where(x => x.ContainerData.Index > index).ToList();
-            foreach (var container in containers)
-            {
-                ContainerViewModels.Remove(container);
-            }
-        }
+        private void ClearContainers() => RootContainer.UnregisterContainer();
 
         private void SetSubscribers()
         {
@@ -148,13 +89,12 @@ namespace DirectoryDash.ViewModels
         private void IconService_HandleClick(object? sender, EventArgs e)
         {
             CreateRootContainer();
-            var rootContainer = ContainerViewModels.FirstOrDefault();
-            if (rootContainer == null) return;
+            if (RootContainer == null) return;
 
-            CurrentIndex = rootContainer.ContainerData.Index = 0;
-            rootContainer.ContainerData.XCoord = _iconService.IconX - rootContainer.ContainerData.Width - 20;
-            rootContainer.ContainerData.YCoord = _iconService.IconY - rootContainer.ContainerData.Height - 20;
-
+            CurrentIndex = RootContainer.ContainerData.Index = 0;
+            RootContainer.ContainerData.XCoord = _iconService.IconX - RootContainer.ContainerData.Width - 20;
+            RootContainer.ContainerData.YCoord = _iconService.IconY - RootContainer.ContainerData.Height - 20;
+            ContainersStore.AllContainers.Add(RootContainer);
             IsListVisible = true;
         }
     }
