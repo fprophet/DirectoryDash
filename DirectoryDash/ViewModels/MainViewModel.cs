@@ -6,6 +6,7 @@ using DirectoryDash.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -33,7 +34,6 @@ namespace DirectoryDash.ViewModels
         private int currentIndex = 0;
 
 
-
         public ICommand OnContainerClickCommand => new RelayCommand<object>(OnContainerClick);
         public ICommand OnMouseLeaveCommand => new AsyncRelayCommand(OnMouseLeave);
         public ICommand OnMouseEnterCommand => new AsyncRelayCommand(OnMouseEnter);
@@ -55,9 +55,10 @@ namespace DirectoryDash.ViewModels
 
             foreach (var node in rootNodes)
             {
-                rootContainer.Items.Add(node);
+                rootContainer.ContainerData.Items.Add(node);
             }
-
+            rootContainer.ContainerData.ElementName = Path.GetFileName(SettingsHelper.Settings.SourcePath);
+            rootContainer.ContainerData.ElementPath = SettingsHelper.Settings.SourcePath;
             ContainerViewModels.Add(rootContainer);
         }
 
@@ -71,7 +72,7 @@ namespace DirectoryDash.ViewModels
             if (item.IsDirectory)
             {
                 var items = _explorerService.GetNodes(item.FullPath);
-                CreateContainerNode(containerViewModel, items);
+                CreateContainerNode(containerViewModel, items, item.FullPath);
             }
             else
             {
@@ -85,35 +86,38 @@ namespace DirectoryDash.ViewModels
 
         private void ClearContainers()
         {
-            foreach (var container in ContainerViewModels)
+            foreach (var containerVm in ContainerViewModels)
             {
-                container.Items.Clear();
+                containerVm.ContainerData.Items.Clear();
             }
              ContainerViewModels.Clear();
         }
 
-        private void CreateContainerNode(ContainerViewModel sender, List<ExplorerItem> items)
+        private void CreateContainerNode(ContainerViewModel sender, List<ExplorerItem> items, string nodePath)
         {
-            if( sender.Index < CurrentIndex)
-                ClearFromIndex(sender.Index);
+            if( sender.ContainerData.Index < CurrentIndex)
+                ClearFromIndex(sender.ContainerData.Index);
 
             var nextIndex = ContainerViewModels.Count;
             ClearContainersWithIndex(nextIndex);
 
             ContainerViewModel containerViewModel = new ContainerViewModel(_explorerService, _iconService);
-            containerViewModel.XCoord = sender.XCoord - sender.Width - 20;
-            containerViewModel.YCoord = sender.YCoord;
+            containerViewModel.ContainerData.ElementName = Path.GetFileName(nodePath);
+            containerViewModel.ContainerData.ElementPath = nodePath;
+            containerViewModel.ContainerData.XCoord = sender.ContainerData.XCoord - sender.ContainerData.Width - 20;
+            containerViewModel.ContainerData.YCoord = sender.ContainerData.YCoord;
+
             foreach (var item in items)
             {
-                containerViewModel.Items.Add(item);
+                containerViewModel.ContainerData.Items.Add(item);
             }
-            CurrentIndex = containerViewModel.Index = nextIndex;
+            CurrentIndex = containerViewModel.ContainerData.Index = nextIndex;
             ContainerViewModels.Add(containerViewModel);
         }
 
         private void ClearContainersWithIndex(int nextIndex)
         {
-            var containers = ContainerViewModels.Where(x => x.Index > nextIndex).ToList();
+            var containers = ContainerViewModels.Where(x => x.ContainerData.Index > nextIndex).ToList();
             foreach (var container in containers)
             {
                 ContainerViewModels.Remove(container);
@@ -122,7 +126,7 @@ namespace DirectoryDash.ViewModels
 
         private void ClearFromIndex(int index)
         {
-            var containers = ContainerViewModels.Where(x => x.Index > index).ToList();
+            var containers = ContainerViewModels.Where(x => x.ContainerData.Index > index).ToList();
             foreach (var container in containers)
             {
                 ContainerViewModels.Remove(container);
@@ -143,14 +147,13 @@ namespace DirectoryDash.ViewModels
 
         private void IconService_HandleClick(object? sender, EventArgs e)
         {
-            
             CreateRootContainer();
             var rootContainer = ContainerViewModels.FirstOrDefault();
             if (rootContainer == null) return;
 
-            CurrentIndex = rootContainer.Index = 0;
-            rootContainer.XCoord = _iconService.IconX - rootContainer.Width - 20;
-            rootContainer.YCoord = _iconService.IconY - rootContainer.Height - 20;
+            CurrentIndex = rootContainer.ContainerData.Index = 0;
+            rootContainer.ContainerData.XCoord = _iconService.IconX - rootContainer.ContainerData.Width - 20;
+            rootContainer.ContainerData.YCoord = _iconService.IconY - rootContainer.ContainerData.Height - 20;
 
             IsListVisible = true;
         }

@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using DirectoryDash.Models;
 using DirectoryDash.Services;
 using System;
@@ -7,35 +8,28 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace DirectoryDash.ViewModels
 {
     internal partial class ContainerViewModel : ObservableObject
     {
-        public ObservableCollection<ExplorerItem> Items { get; set; } = new ObservableCollection<ExplorerItem>();
-
         [ObservableProperty]
-        private int xCoord;
+        private ExplorerContainer containerData = new ExplorerContainer();
+        private ExplorerService _explorerService;
+        private IconService _iconService;
 
-        [ObservableProperty]
-        private int yCoord;
-
-        [ObservableProperty]
-        private int width = 200;
-
-        [ObservableProperty]
-        private int height = 300;
-
-        [ObservableProperty]
-        private string elementName;
-
-        [ObservableProperty]
-        private int index = 0;
-
+        public ICommand OpenInExplorerCommand => new RelayCommand(OpenInExplorer);
 
         public ContainerViewModel(ExplorerService explorerService, IconService iconService)
         {
-            
+            _explorerService = explorerService;
+            _iconService = iconService;
+        }
+
+        private void OpenInExplorer()
+        {
+            _explorerService.OpenFile(containerData.ElementPath);
         }
     }
 }

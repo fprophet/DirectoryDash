@@ -1,17 +1,25 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace DirectoryDash.Models
 {
-    internal class ExplorerItem
+    internal partial class ExplorerItem : ObservableObject
     {
-        public string Name { get; set; }
+        [ObservableProperty]
+        private string name;
+
+        [ObservableProperty]
+        public string fullPath;
         
-        public string FullPath { get; set; }
-        
-        public bool IsDirectory { get; set; }
+        [ObservableProperty]
+        public bool isDirectory;
+
+        [ObservableProperty]
+        public ImageSource icon;
     }
 }

@@ -17,11 +17,20 @@ namespace DirectoryDash.Models
 
         [ObservableProperty]
         private int yCoord;
- 
-        [ObservableProperty]
-        private int width;
 
         [ObservableProperty]
-        private int height;
+        private int width = 200;
+
+        [ObservableProperty]
+        private int height = 300;
+
+        [ObservableProperty]
+        private string elementName;
+
+        [ObservableProperty]
+        private string elementPath;
+
+        [ObservableProperty]
+        private int index = 0;
     }
 }
