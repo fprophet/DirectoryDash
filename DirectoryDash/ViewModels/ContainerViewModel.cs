@@ -1,5 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DirectoryDash.Factories;
+using DirectoryDash.Helpers;
 using DirectoryDash.Models;
 using DirectoryDash.Services;
 using DirectoryDash.Stores;
@@ -17,6 +19,7 @@ namespace DirectoryDash.ViewModels
 {
     internal partial class ContainerViewModel : ObservableObject
     {
+        private Func<ExplorerContainerData, ContainerViewModel> _containerVmFactory;
         private ExplorerService _explorerService;
         private IconService _iconService;
 
@@ -33,32 +36,55 @@ namespace DirectoryDash.ViewModels
         public ICommand OnContainerClickCommand => new RelayCommand<ExplorerItem>(OnContainerClick);
         public ICommand UnregisterContainerCommand => new RelayCommand(UnregisterContainer);
 
-        public ContainerViewModel(ExplorerService explorerService, IconService iconService, ContainersStore containersStore)
+        public ContainerViewModel(
+            ExplorerService explorerService,
+            IconService iconService,
+            ContainersStore containersStore,
+            Func<ExplorerContainerData, ContainerViewModel> containerVmFactory,
+            ExplorerContainerData data)
         {
+            _containerVmFactory = containerVmFactory;
             _explorerService = explorerService;
             _iconService = iconService;
+            ContainerData = data;
             ContainersStore = containersStore;
+
+            Initialize();
+        }
+
+        private void Initialize()
+        {
+            if (ContainerData == null) return;
+
+            //create the nodes for the paths saved by user
+            if (ContainerData.IsPathSelection)
+            {
+                var rootNodes = _explorerService.GetNodesFromSavedPaths(SettingsHelper.Settings.SavedPaths);
+
+                foreach (var node in rootNodes)
+                {
+                    ContainerData.Items.Add(node);
+                }
+            }
+            else
+            {
+                var rootNodes = _explorerService.GetNodes(ContainerData.ElementPath);
+
+                foreach (var node in rootNodes)
+                {
+                    ContainerData.Items.Add(node);
+                }
+            }
         }
 
         private void OpenInExplorer() => _explorerService.OpenFile(containerData.ElementPath);
 
 
-        private ContainerViewModel CreateContainerNode(List<ExplorerItem> items, string nodePath)
+        private ContainerViewModel CreateContainerNode(string nodePath)
         {
-
-            ContainerViewModel containerViewModel = new ContainerViewModel(_explorerService, _iconService, ContainersStore);
-            containerViewModel.ContainerData.ElementName = Path.GetFileName(nodePath);
-            containerViewModel.ContainerData.ElementPath = nodePath;
-            containerViewModel.ContainerData.XCoord = ContainerData.XCoord - ContainerData.Width - 20;
-            containerViewModel.ContainerData.YCoord = ContainerData.YCoord;
-
-            foreach (var item in items)
-            {
-                containerViewModel.ContainerData.Items.Add(item);
-            }
-
+            var data = ExplorerContainerDataFactory.CreateChildData(ContainerData, nodePath);
+            ContainerViewModel containerViewModel = _containerVmFactory(data);
             ChildContainer = containerViewModel;
-
             return containerViewModel;
         }
 
@@ -75,10 +101,8 @@ namespace DirectoryDash.ViewModels
             if (item.IsDirectory)
             {
                 UnregisterChildContainer();
-                var items = _explorerService.GetNodes(item.FullPath);
-                var containerViewModel = CreateContainerNode(items, item.FullPath);
+                var containerViewModel = CreateContainerNode(item.FullPath);
                 RegisterContainer(containerViewModel);
-
             }
             else
             {

@@ -25,6 +25,7 @@ namespace DirectoryDash.ViewModels
         private string title;
         private IconService _iconService;
         private ExplorerService _explorerService;
+        private Func<ExplorerContainerData, ContainerViewModel> _containerVmFactory;
 
         public ContainersStore ContainersStore { get; }
 
@@ -41,10 +42,15 @@ namespace DirectoryDash.ViewModels
         public ICommand OnMouseLeaveCommand => new AsyncRelayCommand(OnMouseLeave);
         public ICommand OnMouseEnterCommand => new AsyncRelayCommand(OnMouseEnter);
 
-        public MainViewModel(ExplorerService explorerService, IconService iconService, ContainersStore containersStore)
+        public MainViewModel(
+            ExplorerService explorerService,
+            IconService iconService,
+            ContainersStore containersStore,
+            Func<ExplorerContainerData, ContainerViewModel> containerVmFactory)
         {
             _iconService = iconService;
             _explorerService = explorerService;
+            _containerVmFactory = containerVmFactory;
             ContainersStore = containersStore;
 
 
@@ -53,26 +59,22 @@ namespace DirectoryDash.ViewModels
 
         private void CreateRootContainer()
         {
-            var sourceDirectory = SettingsHelper.Settings.SourcePath;
-            var rootNodes = _explorerService.GetNodes(sourceDirectory);
+            var sourceDirectory = SettingsHelper.Settings.SavedPaths.First();
+            RootContainer = _containerVmFactory(new ExplorerContainerData() { ElementPath = sourceDirectory });
+        }
 
-            ContainerViewModel rootContainerVm = new ContainerViewModel(_explorerService, _iconService, ContainersStore);
 
-            foreach (var node in rootNodes)
-            {
-                rootContainerVm.ContainerData.Items.Add(node);
-            }
-            rootContainerVm.ContainerData.ElementName = Path.GetFileName(SettingsHelper.Settings.SourcePath);
-            rootContainerVm.ContainerData.ElementPath = SettingsHelper.Settings.SourcePath;
-
-            RootContainer = rootContainerVm;
+        private void CreateRootSelectionContainer()
+        {
+            var data = new ExplorerContainerData() { IsPathSelection = true };
+            RootContainer = _containerVmFactory(data);
         }
 
         private async Task OnMouseLeave() => await _explorerService.StartClear();
 
         private async Task OnMouseEnter() => await _explorerService.CancelClear();
 
-        private void ClearContainers() => RootContainer.UnregisterContainer();
+        private void ClearContainers() => RootContainer?.UnregisterContainer();
 
         private void SetSubscribers()
         {
@@ -88,7 +90,14 @@ namespace DirectoryDash.ViewModels
 
         private void IconService_HandleClick(object? sender, EventArgs e)
         {
-            CreateRootContainer();
+            ClearView();
+         
+            if( SettingsHelper.Settings.SavedPaths.Count > 1)
+                CreateRootSelectionContainer();
+            else
+                CreateRootContainer();
+
+
             if (RootContainer == null) return;
 
             CurrentIndex = RootContainer.ContainerData.Index = 0;
@@ -97,5 +106,6 @@ namespace DirectoryDash.ViewModels
             ContainersStore.AllContainers.Add(RootContainer);
             IsListVisible = true;
         }
+
     }
 }

@@ -1,7 +1,10 @@
-﻿using DirectoryDash.Helpers;
+﻿using DirectoryDash.Factories;
+using DirectoryDash.Helpers;
+using DirectoryDash.Models;
 using DirectoryDash.Services;
 using DirectoryDash.Stores;
 using DirectoryDash.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
 using System.Configuration;
 using System.Data;
 using System.Drawing;
@@ -19,11 +22,28 @@ namespace DirectoryDash
         {
 
             SettingsHelper.CheckSettings();
-            MainWindow window = new MainWindow();
-            var iconService = new Services.IconService();
-            var explorerService = new Services.ExplorerService();
-            var store = new ContainersStore();
-            window.DataContext = new MainViewModel(explorerService, iconService, store);
+
+            ServiceCollection serviceCollection = new ServiceCollection();
+            serviceCollection.AddSingleton<ExplorerService>();
+            serviceCollection.AddSingleton<IconService>();
+            serviceCollection.AddSingleton<ContainersStore>();
+
+            serviceCollection.AddTransient<MainWindow>();
+            serviceCollection.AddTransient<MainViewModel>();
+            serviceCollection.AddTransient<ContainerViewModel>();
+            serviceCollection.AddTransient<SettingsViewModel>();
+            serviceCollection.AddTransient<ItemFactory>();
+
+
+            serviceCollection.AddTransient<Func<ExplorerContainerData, ContainerViewModel>>(s => data =>
+                ActivatorUtilities.CreateInstance<ContainerViewModel>(s, data));
+
+            IServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
+
+            var window = serviceProvider.GetRequiredService<MainWindow>();
+            var mainViewModel = serviceProvider.GetRequiredService<MainViewModel>();
+            
+            window.DataContext = mainViewModel;
             window.Show();
 
 

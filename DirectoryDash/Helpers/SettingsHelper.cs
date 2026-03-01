@@ -30,17 +30,17 @@ namespace DirectoryDash.Helpers
                 CreateDefaultSettings();
             }
 
-            GetSettings();
+            LoadSettings();
         }
 
-        private static void GetSettings()
+        private static void LoadSettings()
         {
             var settings = File.ReadAllText(SettingsFile);
-            var json = JsonSerializer.Deserialize<Models.Settings>(settings);
+            var json = JsonSerializer.Deserialize<Settings>(settings);
 
             Settings = new Settings()
             {
-                SourcePath = json.SourcePath,
+                SavedPaths = json.SavedPaths,
                 OnStartup = json.OnStartup,
                 FoldersOnly = json.FoldersOnly
             };
@@ -50,12 +50,17 @@ namespace DirectoryDash.Helpers
         {
             var settings = new Models.Settings()
             {
-                SourcePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                SavedPaths = new List<string>() { Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) },
                 OnStartup = true,
                 FoldersOnly = false
             };
 
             File.WriteAllText(SettingsFile, JsonSerializer.Serialize(settings));
+        }
+
+        public static void SaveSettings()
+        {
+            File.WriteAllText(SettingsFile, JsonSerializer.Serialize(Settings));
         }
     }
 }

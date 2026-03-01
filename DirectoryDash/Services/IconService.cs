@@ -1,4 +1,7 @@
-﻿using System;
+﻿using DirectoryDash.Factories;
+using DirectoryDash.ViewModels;
+using DirectoryDash.Views;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,22 +14,35 @@ namespace DirectoryDash.Services
     {
         public event EventHandler IconClick;
 
+        private ItemFactory _itemFactory;
         private NotifyIcon _icon;
 
         public int IconX { get; private set; }
         public int IconY { get; private set; }
 
-        public IconService()
+        public IconService(ItemFactory itemFactory)
         {
+            _itemFactory = itemFactory;
+
             _icon = new NotifyIcon();
             _icon.Icon = new Icon("tray.ico");
             _icon.Visible = true;
             _icon.Click += HandleClick;
             _icon.ContextMenuStrip = new ContextMenuStrip();
-            _icon.ContextMenuStrip.Items.Add("Settings", null);
+            _icon.ContextMenuStrip.Items.Add("Settings", null, OpenSettingsWindow);
             _icon.ContextMenuStrip.Items.Add("-", null);
             _icon.ContextMenuStrip.Items.Add("Exit", null, (s, args) => System.Windows.Application.Current.Shutdown());
             _icon.ContextMenuStrip.Show();
+        }
+
+        private void OpenSettingsWindow(object? sender, EventArgs e)
+        {
+
+            var vm = _itemFactory.Create<SettingsViewModel>();
+            var settingsWindow = new SettingsWindow();
+            settingsWindow.DataContext = vm;
+            settingsWindow.Show();
+
         }
 
         public void OnIconClick()
@@ -36,8 +52,6 @@ namespace DirectoryDash.Services
 
         private void HandleClick(object? sender, EventArgs e)
         {
-
-
             var icon = sender as NotifyIcon;
             if (e is MouseEventArgs mouseEventArgs && mouseEventArgs.Button == MouseButtons.Right)
             {

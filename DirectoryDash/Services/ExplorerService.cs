@@ -19,6 +19,8 @@ namespace DirectoryDash.Services
     {
         public Action Clear { get; internal set; }
 
+
+
         private Dictionary<string, ImageSource> _iconCache = new Dictionary<string, ImageSource>();
 
         private CancellationTokenSource _clearViewCT = new CancellationTokenSource();
@@ -58,7 +60,7 @@ namespace DirectoryDash.Services
             }
         }
 
-        private void GetIconsForNodes(List<ExplorerItem> nodes)
+        public void GetIconsForNodes(List<ExplorerItem> nodes)
         {
             foreach (var node in nodes)
             {
@@ -123,5 +125,29 @@ namespace DirectoryDash.Services
             return Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
         }
 
+        internal string SelectDirectory()
+        {
+            var dialog = new System.Windows.Forms.FolderBrowserDialog();
+            dialog.ShowDialog();
+            return dialog.SelectedPath;
+        }
+
+        internal IEnumerable<ExplorerItem> GetNodesFromSavedPaths(List<string> savedPaths)
+        {
+            var items = new List<ExplorerItem>();
+            foreach (var node in SettingsHelper.Settings.SavedPaths)
+            {
+                items.Add(new ExplorerItem
+                {
+                    FullPath = node,
+                    Name = Path.GetFileName(node),
+                    IsDirectory = true,
+                });
+            }
+
+            GetIconsForNodes(items);
+
+            return items;
+        }
     }
 }

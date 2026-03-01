@@ -8,7 +8,7 @@ namespace DirectoryDash.Models
 {
     internal class Settings
     {
-        public string SourcePath { get; set; }
+        public List<string> SavedPaths { get; set; } = new List<string>();
 
         public bool OnStartup { get; set; } = true;
 

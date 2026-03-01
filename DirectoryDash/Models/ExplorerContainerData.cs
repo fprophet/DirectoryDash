@@ -32,5 +32,8 @@ namespace DirectoryDash.Models
 
         [ObservableProperty]
         private int index = 0;
+
+        [ObservableProperty]
+        private bool isPathSelection = false;
     }
 }

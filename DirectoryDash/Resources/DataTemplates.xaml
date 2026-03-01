@@ -6,6 +6,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     
     <converters:ContainerLinkConverter x:Key="ContainerLinkConverter" />
+    <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" />
     <BooleanToVisibilityConverter x:Key="BoolToVis" />
     
     <DataTemplate x:Key="ContainerTemplate">
@@ -48,30 +49,52 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
-                        <Border >
+                    <Border Visibility="{Binding ContainerData.IsPathSelection, Converter={StaticResource BoolToVis}}">
+                            <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!--<TextBlock Text="Your saved paths" Foreground="White" VerticalAlignment="Center"/>-->
+
+                            <Button Style="{StaticResource MaterialDesignToolButton}"
+                                Command="{Binding UnregisterContainerCommand}"
+                                Grid.Column="1" HorizontalAlignment="Right"
+                                ToolTip="Close">
+                                <material:PackIcon Kind="Close" Foreground="Red"/>
+                            </Button>
+                        </Grid>
+                        </Border>
+
+                        <Border Visibility="{Binding ContainerData.IsPathSelection, Converter={StaticResource InverseBoolToVisibilityConverter}}">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
+                                
                                 <Button Style="{StaticResource MaterialDesignToolButton}"
-                                Command="{Binding OpenInExplorerCommand}"
-                                HorizontalAlignment="Left" ToolTip="Open in Explorer">
+                                    Command="{Binding OpenInExplorerCommand}"
+                                    HorizontalAlignment="Left" ToolTip="Open in Explorer">
                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
                                         <material:PackIcon Kind="OpenInNew" Foreground="White" VerticalAlignment="Bottom"/>
                                         <TextBlock Text="{Binding ContainerData.ElementName}" VerticalAlignment="Center" Margin="10,0,0,0"/>
                                     </StackPanel>
                                 </Button>
+                                
                                 <Button Style="{StaticResource MaterialDesignToolButton}"
                                         Command="{Binding UnregisterContainerCommand}"
                                         Grid.Column="1" HorizontalAlignment="Right"
-                                    ToolTip="Close">
+                                        ToolTip="Close">
                                     <material:PackIcon Kind="Close" Foreground="Red"/>
                                 </Button>
                             </Grid>
                         </Border>
+                        
                         <Separator Grid.Row="1" Background="White" Height="0.5"/>
-                        <ScrollViewer  VerticalScrollBarVisibility="Auto" x:Name="ParentContainer" Grid.Row="2"
+                        
+                        <ScrollViewer  VerticalScrollBarVisibility="Auto" x:Name="ParentContainer" Grid.Row="2" Margin="0,10,0,0"
                                 MaxHeight="{Binding DataContext.ParentListMaxHeight, RelativeSource={RelativeSource AncestorType=Window}}"
                                 MaxWidth="{Binding DataContext.ParentListMaxWidth, RelativeSource={RelativeSource AncestorType=Window}}" 
                                 Width="{Binding ContainerData.Width}" Height="{Binding ContainerData.Height}">
