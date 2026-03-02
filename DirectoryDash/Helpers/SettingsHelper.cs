@@ -1,12 +1,7 @@
 ﻿using DirectoryDash.Models;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Text.Json.Nodes;
-using System.Threading.Tasks;
+
 
 namespace DirectoryDash.Helpers
 {
@@ -44,6 +39,20 @@ namespace DirectoryDash.Helpers
                 OnStartup = json.OnStartup,
                 FoldersOnly = json.FoldersOnly
             };
+
+            CheckSavedPaths();
+        }
+
+        private static void CheckSavedPaths()
+        {
+            var nonExistent = Settings.SavedPaths.Where(path => !System.IO.Directory.Exists(path)).ToList();
+
+            foreach (var path in nonExistent)
+            {
+                Settings.SavedPaths.Remove(path);
+            }
+
+            SaveSettings();
         }
 
         private static void CreateDefaultSettings()
@@ -61,6 +70,23 @@ namespace DirectoryDash.Helpers
         public static void SaveSettings()
         {
             File.WriteAllText(SettingsFile, JsonSerializer.Serialize(Settings));
+        }
+
+        //add condition for directory to exist
+        internal static bool AddPath(string elementPath)
+        {
+            if (string.IsNullOrEmpty(elementPath) || Settings.SavedPaths.Contains(elementPath))
+                return false;
+
+            Settings.SavedPaths.Add(elementPath);
+            SaveSettings();
+            return true;
+        }
+
+        internal static void RemoveSavedPath(string path)
+        {
+            Settings.SavedPaths.Remove(path);
+            SaveSettings();
         }
     }
 }

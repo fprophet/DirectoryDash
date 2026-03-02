@@ -1,0 +1,132 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
+                    xmlns:converters="clr-namespace:DirectoryDash.Converters"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    
+    <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" />
+    <BooleanToVisibilityConverter x:Key="BoolToVis" />
+    
+    <Style x:Key="DarkListViewItemStyle"
+       TargetType="ListViewItem">
+
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="#EAEAEA"/>
+        <Setter Property="Padding" Value="12,8"/>
+        <Setter Property="Margin" Value="0,2"/>
+        <Setter Property="BorderThickness" Value="0"/>
+
+        <Setter Property="material:RippleAssist.Feedback" Value="Transparent"/>
+        <Setter Property="material:RippleAssist.IsCentered" Value="True"/>
+
+        <Style.Triggers>
+
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="#252525"/>
+            </Trigger>
+
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsSelected" Value="True"/>
+                    <Condition Property="Selector.IsSelectionActive" Value="True"/>
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="#2F2F2F"/>
+                <Setter Property="Foreground" Value="White"/>
+            </MultiTrigger>
+
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsSelected" Value="True"/>
+                    <Condition Property="Selector.IsSelectionActive" Value="False"/>
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="#262626"/>
+                <Setter Property="Foreground" Value="#CCCCCC"/>
+            </MultiTrigger>
+
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.5"/>
+            </Trigger>
+
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="ListViewItemWithContextMenu" TargetType="ListViewItem">
+        <Setter Property="Tag" Value="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ListView}}"/>
+        <Setter Property="ContextMenu">
+            <Setter.Value>
+                <ContextMenu Placement="MousePoint"
+                        DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource Self}}"
+                        Visibility="{Binding ContainerData.IsPathSelection,
+                        Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                    
+                    <MenuItem Header="Open"
+                            Command="{Binding OpenInExplorerCommand}"
+                            CommandParameter="{Binding PlacementTarget.DataContext.FullPath,
+                            RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                        <MenuItem.Icon>
+                            <material:PackIcon Kind="OpenInNew"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    
+                    <MenuItem Header="Copy Path"
+                                Command="{Binding CopyPathToClipboardCommand}"
+                                CommandParameter="{Binding PlacementTarget.DataContext.FullPath,
+                                RelativeSource={RelativeSource AncestorType=ContextMenu}}" >
+                        <MenuItem.Icon>
+                            <material:PackIcon Kind="ContentCopy"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    
+                    <MenuItem Header="Copy File"
+                            Command="{Binding CopyFileToClipboardCommand}"
+                            CommandParameter="{Binding PlacementTarget.DataContext.FullPath,
+                            RelativeSource={RelativeSource AncestorType=ContextMenu}}" 
+                            Visibility="{Binding PlacementTarget.DataContext.IsDirectory, RelativeSource={RelativeSource AncestorType=ContextMenu},
+                            Converter={StaticResource InverseBoolToVisibilityConverter}}" >
+                        <MenuItem.Icon>
+                            <material:PackIcon Kind="FileOutline"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+
+                    <MenuItem Header="Save Navigation Path"
+                            Command="{Binding SaveNavigationPathCommand}"
+                            CommandParameter="{Binding PlacementTarget.DataContext.FullPath,
+                            RelativeSource={RelativeSource AncestorType=ContextMenu}}" 
+                            Visibility="{Binding PlacementTarget.DataContext.IsDirectory, RelativeSource={RelativeSource AncestorType=ContextMenu},
+                            Converter={StaticResource BoolToVis}}" >
+                        <MenuItem.Icon>
+                            <material:PackIcon Kind="Floppy"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+
+                    <MenuItem Header="Rename"
+                           Command="{Binding StartRenameItemCommand}"
+                           CommandParameter="{Binding PlacementTarget.DataContext,
+                           RelativeSource={RelativeSource AncestorType=ContextMenu}}"  >
+                        <MenuItem.Icon>
+                            <material:PackIcon Kind="Rename"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    
+                    <MenuItem Header="Properties"
+                            Command="{Binding OpenItemPropertiesCommand}"
+                            CommandParameter="{Binding PlacementTarget.DataContext.FullPath,
+                            RelativeSource={RelativeSource AncestorType=ContextMenu}}"  >
+                        <MenuItem.Icon>
+                            <material:PackIcon Kind="Cogs"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    
+                    <MenuItem Header="Delete" Foreground="Red"
+                            Command="{Binding DeleteItemCommand}"
+                            CommandParameter="{Binding PlacementTarget.DataContext.FullPath,
+                            RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                        <MenuItem.Icon>
+                            <material:PackIcon Kind="Delete" Foreground="Red"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    
+                </ContextMenu>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

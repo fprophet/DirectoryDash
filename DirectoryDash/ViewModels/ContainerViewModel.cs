@@ -14,6 +14,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Windows.Shapes;
 
 namespace DirectoryDash.ViewModels
 {
@@ -24,6 +25,7 @@ namespace DirectoryDash.ViewModels
         private IconService _iconService;
 
         public ContainersStore ContainersStore { get; }
+        public ItemListViewModel ItemListViewModel { get; }
 
         [ObservableProperty]
         private ExplorerContainerData containerData = new ExplorerContainerData();
@@ -32,15 +34,14 @@ namespace DirectoryDash.ViewModels
         private ContainerViewModel childContainer;
 
 
-        public ICommand OpenInExplorerCommand => new RelayCommand(OpenInExplorer);
         public ICommand OnContainerClickCommand => new RelayCommand<ExplorerItem>(OnContainerClick);
-        public ICommand UnregisterContainerCommand => new RelayCommand(UnregisterContainer);
 
         public ContainerViewModel(
             ExplorerService explorerService,
             IconService iconService,
             ContainersStore containersStore,
             Func<ExplorerContainerData, ContainerViewModel> containerVmFactory,
+            ItemListViewModel itemListViewModel,
             ExplorerContainerData data)
         {
             _containerVmFactory = containerVmFactory;
@@ -48,6 +49,7 @@ namespace DirectoryDash.ViewModels
             _iconService = iconService;
             ContainerData = data;
             ContainersStore = containersStore;
+            ItemListViewModel = itemListViewModel;
 
             Initialize();
         }
@@ -75,10 +77,18 @@ namespace DirectoryDash.ViewModels
                     ContainerData.Items.Add(node);
                 }
             }
+
+            ItemListViewModel.UpdateCollection(ContainerData.Items);
         }
 
-        private void OpenInExplorer() => _explorerService.OpenFile(containerData.ElementPath);
-
+        [RelayCommand]
+        private void OpenInExplorer(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                _explorerService.OpenFile(containerData.ElementPath);
+            else
+                _explorerService.OpenFile(path);
+        }
 
         private ContainerViewModel CreateContainerNode(string nodePath)
         {
@@ -110,6 +120,7 @@ namespace DirectoryDash.ViewModels
             }
         }
 
+        [RelayCommand]
         public void UnregisterContainer()
         {
             var found = ContainersStore.AllContainers.FirstOrDefault(x => x.ContainerData.ElementPath == ContainerData.ElementPath);
@@ -124,16 +135,97 @@ namespace DirectoryDash.ViewModels
             }
         }
 
+        [RelayCommand]
+        private void DeleteItem(string path)
+        {
+            var deleted = _explorerService.DeleteItem(path);
+
+            if (deleted)
+            {
+                var item = ContainerData.Items.FirstOrDefault(x => x.FullPath == path);
+                ContainerData.Items.Remove(item);
+                ItemListViewModel.Refresh();
+            }
+        }
+
+        [RelayCommand]
+        private void CreateFolder()
+        {
+           var path = _explorerService.CreateFolder(ContainerData.ElementPath);
+
+            if (!string.IsNullOrEmpty(path))
+            {
+                var item = _explorerService.GetNode(path);
+                ContainerData.Items.Add(item);
+                ItemListViewModel.Refresh();
+            }
+        }
+
+        [RelayCommand]
+        private void CreateTextDoc()
+        {
+           var path = _explorerService.CreateTextDoc(ContainerData.ElementPath);
+
+            if (!string.IsNullOrEmpty(path))
+            {
+                var item = _explorerService.GetNode(path);
+                ContainerData.Items.Add(item);
+                ItemListViewModel.Refresh();
+            }
+        }
+
+        [RelayCommand]
+        private void SaveNavigationPath(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                path = ContainerData.ElementPath;
+
+            var res = SettingsHelper.AddPath(path);
+            
+            if( !res ) return;
+
+            //update the ui path selection container
+            var pathSelectionContainer = ContainersStore.AllContainers.FirstOrDefault(x => x.ContainerData.IsPathSelection);
+            if( pathSelectionContainer != null)
+            {
+                var item = _explorerService.GetNode(path);
+                pathSelectionContainer.ContainerData.Items.Add(item);
+                pathSelectionContainer.ItemListViewModel.Refresh();
+            }
+        }
+
+        [RelayCommand]
+        private void StartRenameItem(ExplorerItem item) => item.IsEditing = true;
+
+        [RelayCommand]
+        private void SaveItemChanges(ExplorerItem item)
+        {
+            item.IsEditing = false;
+            _explorerService.RenameItem(item.FullPath, item.Name);
+            item.FullPath = System.IO.Path.Combine(ContainerData.ElementPath, item.Name);
+
+            ItemListViewModel.Refresh();
+        }
+
+        [RelayCommand]
+        private void OpenItemProperties(string path) => FileHelper.OpenFileProperties(path);
+
+        [RelayCommand]
+        private void CopyFileToClipboard(string path) => _explorerService.CopyFileToClipboard(path);
+
+        [RelayCommand]
+        private void CopyPathToClipboard(string path) => _explorerService.CopyPathToClipboard(path);
+
         private void UnregisterChildContainer()
         {
             if (ChildContainer == null) return;
-
+            
             var found = ContainersStore.AllContainers.FirstOrDefault(x => x.ContainerData.ElementPath == ChildContainer.ContainerData.ElementPath);
             if (found != null)
                 ContainersStore.AllContainers.Remove(found);
-
+        
             ChildContainer.UnregisterContainer();
-
+        
             ChildContainer = null;
         }
 

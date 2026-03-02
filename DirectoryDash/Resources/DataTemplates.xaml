@@ -3,89 +3,156 @@
                     xmlns:vm="clr-namespace:DirectoryDash.ViewModels"
                     xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
                     xmlns:converters="clr-namespace:DirectoryDash.Converters"
+                    xmlns:behaviors="clr-namespace:DirectoryDash.Behaviors.DirectoryDash.Behaviors"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/Resources/Styles.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
     
     <converters:ContainerLinkConverter x:Key="ContainerLinkConverter" />
     <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" />
     <BooleanToVisibilityConverter x:Key="BoolToVis" />
+   
     
     <DataTemplate x:Key="ContainerTemplate">
-        <Grid>
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="MouseLeftButtonDown">
-                    <i:InvokeCommandAction 
+        <Border Padding="6,3" ToolTip="{Binding FullPath}">
+
+            <Grid HorizontalAlignment="Stretch" Background="Transparent">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseLeftButtonDown">
+                        <i:InvokeCommandAction 
                         CommandParameter="{Binding}"
                         Command="{Binding DataContext.OnContainerClickCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"/>
 
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
-            <StackPanel Orientation="Horizontal">
-                <Image Source="{Binding Icon}" Width="20" Height="20" Margin="2" />
-                <TextBlock Text="{Binding Name}" 
-                    Foreground="#E0E0E0" 
-                    FontSize="13" 
-                    Margin="2"/>
-            </StackPanel>
-        </Grid>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="{Binding Icon}" Width="20" Height="20" Margin="2" />
+                    <TextBlock Text="{Binding Name}" 
+                        Visibility="{Binding IsEditing, Converter={StaticResource InverseBoolToVisibilityConverter}}"
+                        Foreground="#E0E0E0" 
+                        FontSize="13" 
+                        Margin="2"/>
+
+                    <TextBox Text="{Binding Name}" 
+                        Visibility="{Binding IsEditing, Converter={StaticResource BoolToVis}}"
+                        Foreground="#E0E0E0" 
+                        FontSize="13" 
+                        Margin="2"/>
+                </StackPanel>
+
+                <Button Style="{StaticResource MaterialDesignToolButton}"
+                        Command="{Binding DataContext.SaveItemChangesCommand, RelativeSource={RelativeSource AncestorType=ListView}}"
+                        CommandParameter="{Binding}"
+                        Grid.Column="1" ToolTip="Save changes"
+                        Visibility="{Binding IsEditing, Converter={StaticResource BoolToVis}}">
+                    <material:PackIcon Kind="Floppy" Foreground="LightGreen" Width="22" Height="22" Margin="0,0,2,0"/>
+                </Button>
+            </Grid>
+        </Border>
     </DataTemplate>
 
     <DataTemplate DataType="{x:Type vm:ContainerViewModel}">
 
-            <Border Background="#2D2D2D" 
-            CornerRadius="3" 
-            Padding="10" 
-            BorderBrush="#444444"
-            BorderThickness="1">
+    <material:Card Background="#2A2A2A"
+            material:ElevationAssist.Elevation="Dp4"
+            Foreground="White"
+            Padding="0"
+            Margin="8">
 
-                <Border.Effect>
-                    <DropShadowEffect BlurRadius="15" Direction="270" Opacity="0.3" ShadowDepth="2"/>
-                </Border.Effect>
-                <Grid>
+            <material:Card.Effect>
+                <DropShadowEffect BlurRadius="15" Direction="270" Opacity="0.3" ShadowDepth="2"/>
+            </material:Card.Effect>
+            <Grid >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
+                <Border Margin="8,5" Visibility="{Binding ContainerData.IsPathSelection, Converter={StaticResource BoolToVis}}">
                     <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
 
-                    <Border Visibility="{Binding ContainerData.IsPathSelection, Converter={StaticResource BoolToVis}}">
-                            <Grid>
+                        <!--<TextBlock Text="Your saved paths" Foreground="White" VerticalAlignment="Center"/>-->
+
+                        <Button Style="{StaticResource MaterialDesignToolButton}"
+                            Command="{Binding UnregisterContainerCommand}"
+                            Grid.Column="1" HorizontalAlignment="Right"
+                            ToolTip="Close">
+                            <material:PackIcon Kind="Close" Foreground="Red"/>
+                        </Button>
+                    </Grid>
+                </Border>
+
+                <Border Margin="8,5" Visibility="{Binding ContainerData.IsPathSelection, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid Margin="0,0,5,0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
 
-                            <!--<TextBlock Text="Your saved paths" Foreground="White" VerticalAlignment="Center"/>-->
-
                             <Button Style="{StaticResource MaterialDesignToolButton}"
-                                Command="{Binding UnregisterContainerCommand}"
-                                Grid.Column="1" HorizontalAlignment="Right"
-                                ToolTip="Close">
-                                <material:PackIcon Kind="Close" Foreground="Red"/>
+                                Width="36" Height="36"
+                                ToolTip="Menu"
+                                behaviors:LeftClickContextMenuBehavior.OpenOnLeftClick="True"
+                                ContextMenuService.IsEnabled="True">
+                                <material:PackIcon Kind="Menu" Foreground="White"/>
+                                <Button.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="New Folder" Command="{Binding CreateFolderCommand}"  >
+                                            <MenuItem.Icon>
+                                                <material:PackIcon Kind="FolderPlusOutline" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        
+                                        <MenuItem Header="New Text Doc" Command="{Binding CreateTextDocCommand}"  >
+                                            <MenuItem.Icon>
+                                                <material:PackIcon Kind="FilePlusOutline" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        
+                                        <Separator/>
+                                        
+                                        <MenuItem Header="Save Navigation Path" Command="{Binding SaveNavigationPathCommand}">
+                                            <MenuItem.Icon>
+                                                <material:PackIcon Kind="FloppyDisc" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        
+                                    </ContextMenu>
+                                </Button.ContextMenu>
+                            </Button>
+
+                            <Button Grid.Column="1"
+                                Style="{StaticResource MaterialDesignToolButton}"
+                                Command="{Binding OpenInExplorerCommand}"
+                                HorizontalAlignment="Left"
+                                ToolTip="Open in Explorer">
+                                <material:PackIcon Kind="OpenInNew" Foreground="White"/>
                             </Button>
                         </Grid>
-                        </Border>
 
-                        <Border Visibility="{Binding ContainerData.IsPathSelection, Converter={StaticResource InverseBoolToVisibilityConverter}}">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                
-                                <Button Style="{StaticResource MaterialDesignToolButton}"
-                                    Command="{Binding OpenInExplorerCommand}"
-                                    HorizontalAlignment="Left" ToolTip="Open in Explorer">
-                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
-                                        <material:PackIcon Kind="OpenInNew" Foreground="White" VerticalAlignment="Bottom"/>
-                                        <TextBlock Text="{Binding ContainerData.ElementName}" VerticalAlignment="Center" Margin="10,0,0,0"/>
-                                    </StackPanel>
-                                </Button>
-                                
+                        <TextBox Text="{Binding ItemListViewModel.SearchText, UpdateSourceTrigger=PropertyChanged}" material:HintAssist.Hint="{Binding ContainerData.ElementName}"
+                                         VerticalAlignment="Center" Grid.Column="1" Foreground="White"
+                                         HorizontalAlignment="Stretch" Style="{StaticResource MaterialDesignTextBox}"/>
+                            
                                 <Button Style="{StaticResource MaterialDesignToolButton}"
                                         Command="{Binding UnregisterContainerCommand}"
-                                        Grid.Column="1" HorizontalAlignment="Right"
+                                        Grid.Column="2" HorizontalAlignment="Right"
                                         ToolTip="Close">
                                     <material:PackIcon Kind="Close" Foreground="Red"/>
                                 </Button>
@@ -93,15 +160,21 @@
                         </Border>
                         
                         <Separator Grid.Row="1" Background="White" Height="0.5"/>
+
+                <ListView x:Name="ContainerListView"
+                    Grid.Row="2" 
+                    Padding="10"
+                    VerticalContentAlignment="Stretch"
+                    HorizontalContentAlignment="Stretch"
+                    ScrollViewer.CanContentScroll="False"
+                    Style="{StaticResource MaterialDesignListView}"
+                    ItemsSource="{Binding ItemListViewModel.ItemsView}"
+                    ItemTemplate="{StaticResource ContainerTemplate}"
+                    ItemContainerStyle="{StaticResource ListViewItemWithContextMenu}"
+                    Width="{Binding ContainerData.Width}"
+                    Height="{Binding ContainerData.Height}" />
                         
-                        <ScrollViewer  VerticalScrollBarVisibility="Auto" x:Name="ParentContainer" Grid.Row="2" Margin="0,10,0,0"
-                                MaxHeight="{Binding DataContext.ParentListMaxHeight, RelativeSource={RelativeSource AncestorType=Window}}"
-                                MaxWidth="{Binding DataContext.ParentListMaxWidth, RelativeSource={RelativeSource AncestorType=Window}}" 
-                                Width="{Binding ContainerData.Width}" Height="{Binding ContainerData.Height}">
-                            <ItemsControl ItemsSource="{Binding ContainerData.Items}" ItemTemplate="{StaticResource ContainerTemplate}" />
-                        </ScrollViewer>
-                    </Grid>
-                </Grid>
-            </Border>
+            </Grid>
+        </material:Card>
     </DataTemplate>
 </ResourceDictionary>

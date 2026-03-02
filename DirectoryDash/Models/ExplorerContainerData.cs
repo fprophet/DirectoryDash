@@ -19,7 +19,7 @@ namespace DirectoryDash.Models
         private double yCoord;
 
         [ObservableProperty]
-        private int width = 200;
+        private int width = 300;
 
         [ObservableProperty]
         private int height = 300;

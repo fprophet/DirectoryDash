@@ -32,8 +32,7 @@ namespace DirectoryDash.ViewModels
         private ContainersStore _containersStore;
         [ObservableProperty]
         private bool isListVisible = false;
-        [ObservableProperty]
-        private int parentListMaxHeight = 200;
+
         [ObservableProperty]
         private int parentListMaxWidth = 400;
         [ObservableProperty]
@@ -97,12 +96,11 @@ namespace DirectoryDash.ViewModels
             else
                 CreateRootContainer();
 
-
             if (RootContainer == null) return;
 
             CurrentIndex = RootContainer.ContainerData.Index = 0;
-            RootContainer.ContainerData.XCoord = _iconService.IconX - RootContainer.ContainerData.Width - 20;
-            RootContainer.ContainerData.YCoord = _iconService.IconY - RootContainer.ContainerData.Height - 20;
+            RootContainer.ContainerData.XCoord = _iconService.IconX - RootContainer.ContainerData.Width - 200;
+            RootContainer.ContainerData.YCoord = _iconService.IconY - RootContainer.ContainerData.Height - 100;
             ContainersStore.AllContainers.Add(RootContainer);
             IsListVisible = true;
         }

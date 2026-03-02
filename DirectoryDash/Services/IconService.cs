@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Forms; // Add this using directive at the top
 
 namespace DirectoryDash.Services
@@ -17,8 +18,8 @@ namespace DirectoryDash.Services
         private ItemFactory _itemFactory;
         private NotifyIcon _icon;
 
-        public int IconX { get; private set; }
-        public int IconY { get; private set; }
+        public double IconX { get; private set; }
+        public double IconY { get; private set; }
 
         public IconService(ItemFactory itemFactory)
         {
@@ -37,12 +38,10 @@ namespace DirectoryDash.Services
 
         private void OpenSettingsWindow(object? sender, EventArgs e)
         {
-
             var vm = _itemFactory.Create<SettingsViewModel>();
             var settingsWindow = new SettingsWindow();
             settingsWindow.DataContext = vm;
             settingsWindow.Show();
-
         }
 
         public void OnIconClick()
@@ -66,11 +65,13 @@ namespace DirectoryDash.Services
                     mainWindow.Activate();
                     mainWindow.Focus();
                 }
-
-
                 var (x, y) = GetCurrentMousePosition();
                 IconX = x;
                 IconY = y;
+                double width = SystemParameters.PrimaryScreenWidth;
+                double height = SystemParameters.PrimaryScreenHeight;
+                IconX = width;
+                IconY = height;
 
                 OnIconClick();
             }

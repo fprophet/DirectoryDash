@@ -32,6 +32,7 @@ namespace DirectoryDash
             serviceCollection.AddTransient<MainViewModel>();
             serviceCollection.AddTransient<ContainerViewModel>();
             serviceCollection.AddTransient<SettingsViewModel>();
+            serviceCollection.AddTransient<ItemListViewModel>();
             serviceCollection.AddTransient<ItemFactory>();
 
 

@@ -21,5 +21,8 @@ namespace DirectoryDash.Models
 
         [ObservableProperty]
         public ImageSource icon;
+
+        [ObservableProperty]
+        public bool isEditing = false;
     }
 }
