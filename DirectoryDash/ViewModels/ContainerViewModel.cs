@@ -135,18 +135,6 @@ namespace DirectoryDash.ViewModels
             }
         }
 
-        [RelayCommand]
-        private void DeleteItem(string path)
-        {
-            var deleted = _explorerService.DeleteItem(path);
-
-            if (deleted)
-            {
-                var item = ContainerData.Items.FirstOrDefault(x => x.FullPath == path);
-                ContainerData.Items.Remove(item);
-                ItemListViewModel.Refresh();
-            }
-        }
 
         [RelayCommand]
         private void CreateFolder()
@@ -175,6 +163,19 @@ namespace DirectoryDash.ViewModels
         }
 
         [RelayCommand]
+        private void DeleteItem(string path)
+        {
+            var deleted = _explorerService.DeleteItem(path);
+
+            if (deleted)
+            {
+                var item = ContainerData.Items.FirstOrDefault(x => x.FullPath == path);
+                ContainerData.Items.Remove(item);
+                ItemListViewModel.Refresh();
+            }
+        }
+
+        [RelayCommand]
         private void SaveNavigationPath(string path)
         {
             if (string.IsNullOrEmpty(path))
@@ -195,6 +196,32 @@ namespace DirectoryDash.ViewModels
         }
 
         [RelayCommand]
+        private void RemoveNavigationPath(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return;
+
+            SettingsHelper.RemoveSavedPath(path);
+            
+
+            //the container that is removing the paths is alwyas main container
+
+            if( ContainerData.IsPathSelection)
+            {
+                var item = ContainerData.Items.FirstOrDefault(x => x.FullPath == path);
+                ContainerData.Items.Remove(item);
+
+                //if the removed path is opened from the selection container
+                //close all containers except the selection container
+                if (ContainersStore.AllContainers.Count > 1
+                    && ContainersStore.AllContainers[0].ContainerData.IsPathSelection
+                        && ContainersStore.AllContainers[1].ContainerData.ElementPath == path)
+                    ContainersStore.AllContainers[0].UnregisterChildContainer();
+
+            }
+        }
+
+        [RelayCommand]
         private void StartRenameItem(ExplorerItem item) => item.IsEditing = true;
 
         [RelayCommand]
@@ -203,8 +230,6 @@ namespace DirectoryDash.ViewModels
             item.IsEditing = false;
             _explorerService.RenameItem(item.FullPath, item.Name);
             item.FullPath = System.IO.Path.Combine(ContainerData.ElementPath, item.Name);
-
-            ItemListViewModel.Refresh();
         }
 
         [RelayCommand]
@@ -228,6 +253,5 @@ namespace DirectoryDash.ViewModels
         
             ChildContainer = null;
         }
-
     }
 }

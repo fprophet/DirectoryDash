@@ -12,5 +12,6 @@ namespace DirectoryDash.Stores
     internal class ContainersStore : ObservableObject
     {
         public ObservableCollection<ContainerViewModel> AllContainers { get; } = new ObservableCollection<ContainerViewModel>();
+
     }
 }

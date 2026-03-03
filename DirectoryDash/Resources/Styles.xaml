@@ -54,9 +54,7 @@
         <Setter Property="ContextMenu">
             <Setter.Value>
                 <ContextMenu Placement="MousePoint"
-                        DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource Self}}"
-                        Visibility="{Binding ContainerData.IsPathSelection,
-                        Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                        DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
                     
                     <MenuItem Header="Open"
                             Command="{Binding OpenInExplorerCommand}"
@@ -128,5 +126,49 @@
                 </ContextMenu>
             </Setter.Value>
         </Setter>
+
+        <Style.Triggers>
+
+            <!-- When IsPathSelection == false -->
+            <DataTrigger Binding="{Binding Tag.ContainerData.IsPathSelection, RelativeSource={RelativeSource Self}}"
+                     Value="True">
+
+                <Setter Property="ContextMenu">
+                    <Setter.Value>
+                        <ContextMenu
+                        DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
+                            <MenuItem Header="Open"
+                                   Command="{Binding OpenInExplorerCommand}"
+                                   CommandParameter="{Binding PlacementTarget.DataContext.FullPath,
+                                   RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                                <MenuItem.Icon>
+                                    <material:PackIcon Kind="OpenInNew"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+
+                            <MenuItem Header="Copy Path"
+                                   Command="{Binding CopyPathToClipboardCommand}"
+                                   CommandParameter="{Binding PlacementTarget.DataContext.FullPath,
+                                   RelativeSource={RelativeSource AncestorType=ContextMenu}}" >
+                                <MenuItem.Icon>
+                                    <material:PackIcon Kind="ContentCopy"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            
+                            <MenuItem Header="Remove Navigation Path" Foreground="Red"
+                                Command="{Binding RemoveNavigationPathCommand}"
+                                CommandParameter="{Binding PlacementTarget.DataContext.FullPath,
+                                RelativeSource={RelativeSource AncestorType=ContextMenu}}" >
+                                <MenuItem.Icon>
+                                    <material:PackIcon Kind="Remove" Foreground="Red"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                        </ContextMenu>
+                    </Setter.Value>
+                </Setter>
+
+            </DataTrigger>
+
+        </Style.Triggers>
     </Style>
 </ResourceDictionary>
