@@ -73,7 +73,7 @@ namespace DirectoryDash.Helpers
         }
 
         //add condition for directory to exist
-        internal static bool AddPath(string elementPath)
+        internal static bool AddNavigationPath(string elementPath)
         {
             if (string.IsNullOrEmpty(elementPath) || Settings.SavedPaths.Contains(elementPath))
                 return false;
@@ -83,7 +83,7 @@ namespace DirectoryDash.Helpers
             return true;
         }
 
-        internal static void RemoveSavedPath(string path)
+        internal static void RemoveNavigationPath(string path)
         {
             Settings.SavedPaths.Remove(path);
             SaveSettings();

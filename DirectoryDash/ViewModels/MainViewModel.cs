@@ -52,7 +52,6 @@ namespace DirectoryDash.ViewModels
             _containerVmFactory = containerVmFactory;
             ContainersStore = containersStore;
 
-
             SetSubscribers();
         }
 

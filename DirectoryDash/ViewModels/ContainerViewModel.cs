@@ -33,7 +33,6 @@ namespace DirectoryDash.ViewModels
         [ObservableProperty]
         private ContainerViewModel childContainer;
 
-
         public ICommand OnContainerClickCommand => new RelayCommand<ExplorerItem>(OnContainerClick);
 
         public ContainerViewModel(
@@ -81,15 +80,6 @@ namespace DirectoryDash.ViewModels
             ItemListViewModel.UpdateCollection(ContainerData.Items);
         }
 
-        [RelayCommand]
-        private void OpenInExplorer(string path)
-        {
-            if (string.IsNullOrEmpty(path))
-                _explorerService.OpenFile(containerData.ElementPath);
-            else
-                _explorerService.OpenFile(path);
-        }
-
         private ContainerViewModel CreateContainerNode(string nodePath)
         {
             var data = ExplorerContainerDataFactory.CreateChildData(ContainerData, nodePath);
@@ -106,6 +96,15 @@ namespace DirectoryDash.ViewModels
         }
 
         [RelayCommand]
+        private void OpenInExplorer(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                _explorerService.OpenFile(containerData.ElementPath);
+            else
+                _explorerService.OpenFile(path);
+        }
+
+        [RelayCommand]
         private void OnContainerClick(ExplorerItem item)
         {
             if (item.IsDirectory)
@@ -119,22 +118,6 @@ namespace DirectoryDash.ViewModels
                 _explorerService.OpenFile(item.FullPath);
             }
         }
-
-        [RelayCommand]
-        public void UnregisterContainer()
-        {
-            var found = ContainersStore.AllContainers.FirstOrDefault(x => x.ContainerData.ElementPath == ContainerData.ElementPath);
-            if (found != null)
-                ContainersStore.AllContainers.Remove(found);
-
-            if( ChildContainer != null)
-            {
-                ChildContainer.UnregisterContainer();
-
-                ChildContainer = null;
-            }
-        }
-
 
         [RelayCommand]
         private void CreateFolder()
@@ -181,7 +164,7 @@ namespace DirectoryDash.ViewModels
             if (string.IsNullOrEmpty(path))
                 path = ContainerData.ElementPath;
 
-            var res = SettingsHelper.AddPath(path);
+            var res = SettingsHelper.AddNavigationPath(path);
             
             if( !res ) return;
 
@@ -201,23 +184,18 @@ namespace DirectoryDash.ViewModels
             if (string.IsNullOrEmpty(path))
                 return;
 
-            SettingsHelper.RemoveSavedPath(path);
-            
+            SettingsHelper.RemoveNavigationPath(path);
 
-            //the container that is removing the paths is alwyas main container
-
-            if( ContainerData.IsPathSelection)
+            //the container that is removing the paths is always the selection container
+            if(ContainerData.IsPathSelection)
             {
                 var item = ContainerData.Items.FirstOrDefault(x => x.FullPath == path);
                 ContainerData.Items.Remove(item);
 
-                //if the removed path is opened from the selection container
                 //close all containers except the selection container
                 if (ContainersStore.AllContainers.Count > 1
-                    && ContainersStore.AllContainers[0].ContainerData.IsPathSelection
                         && ContainersStore.AllContainers[1].ContainerData.ElementPath == path)
                     ContainersStore.AllContainers[0].UnregisterChildContainer();
-
             }
         }
 
@@ -241,11 +219,28 @@ namespace DirectoryDash.ViewModels
         [RelayCommand]
         private void CopyPathToClipboard(string path) => _explorerService.CopyPathToClipboard(path);
 
+        [RelayCommand]
+        public void UnregisterContainer()
+        {
+            var found = ContainersStore.AllContainers.FirstOrDefault(x => x.ContainerData.ElementPath == ContainerData.ElementPath);
+            if (found != null)
+                ContainersStore.AllContainers.Remove(found);
+
+            if (ChildContainer != null)
+            {
+                ChildContainer.UnregisterContainer();
+
+                ChildContainer = null;
+            }
+        }
+
         private void UnregisterChildContainer()
         {
             if (ChildContainer == null) return;
             
-            var found = ContainersStore.AllContainers.FirstOrDefault(x => x.ContainerData.ElementPath == ChildContainer.ContainerData.ElementPath);
+            var found = ContainersStore.AllContainers
+                .FirstOrDefault(x => x.ContainerData.ElementPath == ChildContainer.ContainerData.ElementPath);
+
             if (found != null)
                 ContainersStore.AllContainers.Remove(found);
         

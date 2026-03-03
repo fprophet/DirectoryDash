@@ -210,7 +210,7 @@ namespace DirectoryDash.Services
                 );
 
                 //to move this logic in a different place
-                SettingsHelper.RemoveSavedPath(path);
+                SettingsHelper.RemoveNavigationPath(path);
                 var pathSelectionContainer = _containersStore.AllContainers.FirstOrDefault(x => x.ContainerData.IsPathSelection);
                 if (pathSelectionContainer != null)
                 {
