@@ -32,8 +32,10 @@ namespace DirectoryDash.ViewModels
 
         [ObservableProperty]
         private ContainerViewModel childContainer;
+        private bool _isLoaded = false;
 
         public ICommand OnContainerClickCommand => new RelayCommand<ExplorerItem>(OnContainerClick);
+        public ICommand OnLoadedCommand => new AsyncRelayCommand(OnLoaded);
 
         public ContainerViewModel(
             ExplorerService explorerService,
@@ -50,10 +52,9 @@ namespace DirectoryDash.ViewModels
             ContainersStore = containersStore;
             ItemListViewModel = itemListViewModel;
 
-            Initialize();
         }
 
-        private void Initialize()
+        private async Task InitializeAsync()
         {
             if (ContainerData == null) return;
 
@@ -61,20 +62,12 @@ namespace DirectoryDash.ViewModels
             if (ContainerData.IsPathSelection)
             {
                 var rootNodes = _explorerService.GetNodesFromSavedPaths(SettingsHelper.Settings.SavedPaths);
-
-                foreach (var node in rootNodes)
-                {
-                    ContainerData.Items.Add(node);
-                }
+                ListHelper.UpdateCollection(ContainerData.Items, rootNodes);
             }
             else
             {
                 var rootNodes = _explorerService.GetNodes(ContainerData.ElementPath);
-
-                foreach (var node in rootNodes)
-                {
-                    ContainerData.Items.Add(node);
-                }
+                await ListHelper.AddInBatches(ContainerData.Items, rootNodes, fromDispatcher: true, batchSize: 10);
             }
 
             ItemListViewModel.UpdateCollection(ContainerData.Items);
@@ -93,6 +86,16 @@ namespace DirectoryDash.ViewModels
             var found = ContainersStore.AllContainers.FirstOrDefault(x => x.ContainerData.ElementPath == containerViewModel.ContainerData.ElementPath);
             if (found == null)
                 ContainersStore.AllContainers.Add(containerViewModel);
+        }
+
+        [RelayCommand]
+        public async Task OnLoaded()
+        {
+            if (_isLoaded) return;
+            _isLoaded = true;
+            InitializeAsync();
+
+            //await _explorerService.StartClear();
         }
 
         [RelayCommand]

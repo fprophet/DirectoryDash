@@ -50,7 +50,12 @@
                         <ContentControl Content="{Binding}"
                             Canvas.Left="{Binding ContainerData.XCoord, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              Canvas.Top="{Binding ContainerData.YCoord, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+
                             <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="Loaded">
+                                    <i:InvokeCommandAction Command="{Binding OnLoadedCommand}" />
+                                </i:EventTrigger>
+                                
                                 <i:EventTrigger EventName="MouseLeave">
                                     <i:InvokeCommandAction Command="{Binding DataContext.OnMouseLeaveCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
                                 </i:EventTrigger>
