@@ -33,12 +33,7 @@ namespace DirectoryDash.Helpers
             var settings = File.ReadAllText(SettingsFile);
             var json = JsonSerializer.Deserialize<Settings>(settings);
 
-            Settings = new Settings()
-            {
-                SavedPaths = json.SavedPaths,
-                OnStartup = json.OnStartup,
-                FoldersOnly = json.FoldersOnly
-            };
+            Settings = json ?? new Settings();
 
             CheckSavedPaths();
         }
@@ -61,7 +56,7 @@ namespace DirectoryDash.Helpers
             {
                 SavedPaths = new List<string>() { Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) },
                 OnStartup = true,
-                FoldersOnly = false
+                DirectoriesOnly = false
             };
 
             File.WriteAllText(SettingsFile, JsonSerializer.Serialize(settings));

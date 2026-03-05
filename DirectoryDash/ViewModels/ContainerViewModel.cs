@@ -5,14 +5,6 @@ using DirectoryDash.Helpers;
 using DirectoryDash.Models;
 using DirectoryDash.Services;
 using DirectoryDash.Stores;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Shapes;
 
@@ -35,6 +27,7 @@ namespace DirectoryDash.ViewModels
         private bool _isLoaded = false;
 
         public ICommand OnContainerClickCommand => new RelayCommand<ExplorerItem>(OnContainerClick);
+        public ICommand OnMouseEnterItemCommand => new RelayCommand<ExplorerItem>(OnMouseEnterItem);
         public ICommand OnLoadedCommand => new AsyncRelayCommand(OnLoaded);
 
         public ContainerViewModel(
@@ -110,6 +103,8 @@ namespace DirectoryDash.ViewModels
         [RelayCommand]
         private void OnContainerClick(ExplorerItem item)
         {
+            if (item == null) return;
+
             if (item.IsDirectory)
             {
                 UnregisterChildContainer();
@@ -119,6 +114,21 @@ namespace DirectoryDash.ViewModels
             else
             {
                 _explorerService.OpenFile(item.FullPath);
+            }
+        }
+
+        [RelayCommand]
+        private void OnMouseEnterItem(ExplorerItem item)
+        {
+            if (!SettingsHelper.Settings.NavigateOnHover) return;
+            
+            if (item == null) return;
+
+            if (item.IsDirectory)
+            {
+                UnregisterChildContainer();
+                var containerViewModel = CreateContainerNode(item.FullPath);
+                RegisterContainer(containerViewModel);
             }
         }
 

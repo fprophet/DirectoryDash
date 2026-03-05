@@ -23,6 +23,13 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <i:Interaction.Triggers>
+                    
+                    <i:EventTrigger EventName="MouseEnter">
+                        <i:InvokeCommandAction Command="{Binding DataContext.OnMouseEnterItemCommand,
+                            RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                            CommandParameter="{Binding}"/>
+                    </i:EventTrigger>
+                    
                     <i:EventTrigger EventName="MouseLeftButtonDown">
                         <i:InvokeCommandAction 
                         CommandParameter="{Binding}"

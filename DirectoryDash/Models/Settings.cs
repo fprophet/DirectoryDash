@@ -12,6 +12,8 @@ namespace DirectoryDash.Models
 
         public bool OnStartup { get; set; } = true;
 
-        public bool FoldersOnly { get; set; } = false;
+        public bool DirectoriesOnly { get; set; } = false;
+
+        public bool NavigateOnHover { get; set; } = false;
     }
 }

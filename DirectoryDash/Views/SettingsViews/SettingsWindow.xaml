@@ -1,0 +1,116 @@
+﻿<Window x:Class="DirectoryDash.Views.SettingsViews.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:local="clr-namespace:DirectoryDash.Views.SettingsViews"
+        xmlns:enums="clr-namespace:DirectoryDash.Enums"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        mc:Ignorable="d"
+        Title="Settings" Height="500" Width="600"
+        Background="#FF1E1E1E"
+        WindowStartupLocation="CenterScreen"
+        FontFamily="Segoe UI">
+
+    <Window.Resources>
+        <DataTemplate x:Key="General">
+            <local:GeneralView/>
+        </DataTemplate>
+
+        <DataTemplate x:Key="SourceDirectories">
+            <local:SourceDirectoriesView/>
+        </DataTemplate>
+
+        <DataTemplate x:Key="Info">
+            <local:InfoView/>
+        </DataTemplate>
+
+        <Style x:Key="SettingsContentControlStyle"
+           TargetType="ContentControl">
+
+            <Setter Property="ContentTemplate"
+               Value="{StaticResource General}" />
+
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding CurrentSection}"
+                   Value="{x:Static enums:SettingsSection.General}">
+                    <Setter Property="ContentTemplate"
+                       Value="{StaticResource General}"/>
+                </DataTrigger>
+
+                <DataTrigger Binding="{Binding CurrentSection}"
+                   Value="{x:Static enums:SettingsSection.SourceDirectories}">
+                    <Setter Property="ContentTemplate"
+                       Value="{StaticResource SourceDirectories}"/>
+                </DataTrigger>
+
+                <DataTrigger Binding="{Binding CurrentSection}"
+                   Value="{x:Static enums:SettingsSection.Info}">
+                    <Setter Property="ContentTemplate"
+                       Value="{StaticResource Info}"/>
+                </DataTrigger>
+         
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Background="#FF1E1E1E" >
+            <Button Style="{StaticResource MaterialDesignFlatButton}"
+                    Command="{Binding ChangeSectionCommand}"
+                    CommandParameter="{x:Static enums:SettingsSection.General}"
+                    Margin="8"
+                    Background="Transparent"
+                    Foreground="White">
+                <StackPanel Orientation="Horizontal">
+                    <material:PackIcon Kind="Cog" Width="24"  VerticalAlignment="Center"/>
+                    <TextBlock Text="General" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
+            <Button Style="{StaticResource MaterialDesignFlatButton}"
+                    Command="{Binding ChangeSectionCommand}"
+                    CommandParameter="{x:Static enums:SettingsSection.SourceDirectories}"
+                    Margin="8"
+                    Background="Transparent"
+                    Foreground="White">
+                <StackPanel Orientation="Horizontal">
+                    <material:PackIcon Kind="Folders" Width="24"  VerticalAlignment="Center"/>
+                    <TextBlock Text="Source Directories" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
+            <Button Style="{StaticResource MaterialDesignFlatButton}"
+                    Command="{Binding ChangeSectionCommand}"
+                    CommandParameter="{x:Static enums:SettingsSection.Info}"
+                    Margin="8"
+                    Background="Transparent"
+                    Foreground="White">
+                <StackPanel Orientation="Horizontal">
+                    <material:PackIcon Kind="InformationOutline" Width="24"  VerticalAlignment="Center"/>
+                    <TextBlock Text="About" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+
+        <ContentControl Content="{Binding CurrentViewModel, UpdateSourceTrigger=PropertyChanged}" 
+                        Style="{StaticResource SettingsContentControlStyle}" Grid.Row="1"
+                        Margin="16"/>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal"  Margin="20,0,20,20">
+            <Button Content="Cancel" Width="100" Margin="0,0,10,0"
+                    Command="{Binding DataContext.CancelCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                    Style="{StaticResource MaterialDesignFlatButton}"/>
+            <Button Content="Save" Width="100"
+                     Command="{Binding DataContext.SaveCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                     Style="{StaticResource MaterialDesignRaisedButton}"/>
+        </StackPanel>
+
+    </Grid>
+</Window>

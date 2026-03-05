@@ -1,6 +1,8 @@
 ﻿using DirectoryDash.Factories;
+using DirectoryDash.SettingsViewModels.ViewModels;
 using DirectoryDash.ViewModels;
 using DirectoryDash.Views;
+using DirectoryDash.Views.SettingsViews;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,14 +17,16 @@ namespace DirectoryDash.Services
     {
         public event EventHandler IconClick;
 
+        private SettingsService _settingsService;
         private ItemFactory _itemFactory;
         private NotifyIcon _icon;
 
         public double IconX { get; private set; }
         public double IconY { get; private set; }
 
-        public IconService(ItemFactory itemFactory)
+        public IconService(ItemFactory itemFactory, SettingsService settingsService)
         {
+            _settingsService = settingsService;
             _itemFactory = itemFactory;
 
             _icon = new NotifyIcon();
@@ -30,19 +34,12 @@ namespace DirectoryDash.Services
             _icon.Visible = true;
             _icon.Click += HandleClick;
             _icon.ContextMenuStrip = new ContextMenuStrip();
-            _icon.ContextMenuStrip.Items.Add("Settings", null, OpenSettingsWindow);
+            _icon.ContextMenuStrip.Items.Add("Settings", null, _settingsService.OpenSettingsWindow);
             _icon.ContextMenuStrip.Items.Add("-", null);
             _icon.ContextMenuStrip.Items.Add("Exit", null, (s, args) => System.Windows.Application.Current.Shutdown());
             _icon.ContextMenuStrip.Show();
         }
 
-        private void OpenSettingsWindow(object? sender, EventArgs e)
-        {
-            var vm = _itemFactory.Create<SettingsViewModel>();
-            var settingsWindow = new SettingsWindow();
-            settingsWindow.DataContext = vm;
-            settingsWindow.Show();
-        }
 
         public void OnIconClick()
         {

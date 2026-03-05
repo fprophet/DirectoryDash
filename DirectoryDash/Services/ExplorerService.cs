@@ -46,14 +46,15 @@ namespace DirectoryDash.Services
                 List<ExplorerItem> nodes = new List<ExplorerItem>();
                 foreach (var entry in entires)
                 {
-                    var icon = FileIconHelper.GetSmallIcon(entry);
                     var node = new ExplorerItem()
                     {
                         Name = Path.GetFileName(entry),
                         FullPath = entry,
-                        //Icon = IconToImageSource(icon),
                         IsDirectory = Directory.Exists(entry)
                     };
+
+                    if (!IsDirectoriesOnly(node)) continue;
+
                     nodes.Add(node);
                 }
 
@@ -67,6 +68,15 @@ namespace DirectoryDash.Services
                 Trace.WriteLine($"Error accessing path: {ex.Message}");
                 return new List<ExplorerItem>();
             }
+        }
+
+        private bool IsDirectoriesOnly(ExplorerItem node)
+        {
+            if (SettingsHelper.Settings.DirectoriesOnly
+                    && !node.IsDirectory)
+                return false;
+
+            return true;
         }
 
         public void GetIconsForNodes(List<ExplorerItem> nodes)
@@ -146,10 +156,11 @@ namespace DirectoryDash.Services
             var items = new List<ExplorerItem>();
             foreach (var node in SettingsHelper.Settings.SavedPaths)
             {
+                var nodeName = Path.GetFileName(node);
                 items.Add(new ExplorerItem
                 {
                     FullPath = node,
-                    Name = Path.GetFileName(node),
+                    Name = !string.IsNullOrEmpty(nodeName) ? nodeName : node,
                     IsDirectory = true,
                 });
             }

@@ -12,7 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace DirectoryDash.Views
+namespace DirectoryDash.Views.SettingsViews
 {
     /// <summary>
     /// Interaction logic for SettingsWindow.xaml

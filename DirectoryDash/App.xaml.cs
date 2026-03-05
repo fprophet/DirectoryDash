@@ -2,8 +2,10 @@
 using DirectoryDash.Helpers;
 using DirectoryDash.Models;
 using DirectoryDash.Services;
+using DirectoryDash.SettingsViewModels.ViewModels;
 using DirectoryDash.Stores;
 using DirectoryDash.ViewModels;
+using DirectoryDash.ViewModels.SettingsViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using System.Configuration;
 using System.Data;
@@ -26,12 +28,16 @@ namespace DirectoryDash
             ServiceCollection serviceCollection = new ServiceCollection();
             serviceCollection.AddSingleton<ExplorerService>();
             serviceCollection.AddSingleton<IconService>();
+            serviceCollection.AddSingleton<SettingsService>();
             serviceCollection.AddSingleton<ContainersStore>();
 
             serviceCollection.AddTransient<MainWindow>();
             serviceCollection.AddTransient<MainViewModel>();
             serviceCollection.AddTransient<ContainerViewModel>();
             serviceCollection.AddTransient<SettingsViewModel>();
+            serviceCollection.AddTransient<GeneralViewModel>();
+            serviceCollection.AddTransient<SourceDirectoriesViewModel>();
+            serviceCollection.AddTransient<InfoViewModel>();
             serviceCollection.AddTransient<ItemListViewModel>();
             serviceCollection.AddTransient<ItemFactory>();
 
