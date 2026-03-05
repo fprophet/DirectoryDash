@@ -3,6 +3,7 @@ using DirectoryDash.SettingsViewModels.ViewModels;
 using DirectoryDash.Views.SettingsViews;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,8 +29,15 @@ namespace DirectoryDash.Services
             _settingsWindow = new SettingsWindow();
             _settingsWindow.DataContext = vm;
             _settingsWindow.Show();
-
             _isSettingsOpen = true;
+
+            _settingsWindow.Closing += SettingsWindow_Closing;
+        }
+
+        private void SettingsWindow_Closing(object? sender, CancelEventArgs e)
+        {
+            _isSettingsOpen = false;
+            _settingsWindow.Closing -= SettingsWindow_Closing;
         }
 
         internal void Close()
