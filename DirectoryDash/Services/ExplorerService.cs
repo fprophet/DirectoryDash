@@ -22,8 +22,6 @@ namespace DirectoryDash.Services
     {
         public Action Clear { get; internal set; }
 
-        private Dictionary<string, ImageSource> _iconCache = new Dictionary<string, ImageSource>();
-
         private CancellationTokenSource _clearViewCT = new CancellationTokenSource();
         private ContainersStore _containersStore;
 
@@ -86,28 +84,8 @@ namespace DirectoryDash.Services
                 var icon = FileIconHelper.GetSmallIcon(node.FullPath);
                 var imageSource = IconToImageSource(icon);
                 imageSource.Freeze();
-                string key;
-
-                //if (node.IsDirectory)
-                //    key = "folder";
-                //else if (Path.GetExtension(node.FullPath) == ".exe")
-                //    key = node.FullPath; 
-                //else
-                //    key = Path.GetExtension(node.FullPath).ToLower();
-
-                //_iconCache[key] = imageSource;
                 node.Icon = imageSource;
             }
-
-            //foreach (var node in nodes)
-            //{
-            //    if (node.IsDirectory)
-            //        node.Icon = _iconCache["folder"];
-            //    else if (Path.GetExtension(node.FullPath) == ".exe")
-            //        node.Icon = _iconCache[node.FullPath];
-            //    else
-            //        node.Icon = _iconCache[Path.GetExtension(node.FullPath).ToLower()];
-            //}
         }
 
         internal void OpenFile(string fullPath)

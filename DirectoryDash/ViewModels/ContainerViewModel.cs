@@ -66,9 +66,9 @@ namespace DirectoryDash.ViewModels
             ItemListViewModel.UpdateCollection(ContainerData.Items);
         }
 
-        private ContainerViewModel CreateContainerNode(string nodePath)
+        private ContainerViewModel CreateContainerNode(string nodePath, bool isPositionedAtStart = false)
         {
-            var data = ExplorerContainerDataFactory.CreateChildData(ContainerData, nodePath);
+            var data = ExplorerContainerDataFactory.CreateChildData(ContainerData, nodePath, isPositionedAtStart);
             ContainerViewModel containerViewModel = _containerVmFactory(data);
             ChildContainer = containerViewModel;
             return containerViewModel;
@@ -101,35 +101,14 @@ namespace DirectoryDash.ViewModels
         }
 
         [RelayCommand]
-        private void OnContainerClick(ExplorerItem item)
-        {
-            if (item == null) return;
-
-            if (item.IsDirectory)
-            {
-                UnregisterChildContainer();
-                var containerViewModel = CreateContainerNode(item.FullPath);
-                RegisterContainer(containerViewModel);
-            }
-            else
-            {
-                _explorerService.OpenFile(item.FullPath);
-            }
-        }
+        private void OnContainerClick(ExplorerItem item) => NavigateToNode(item);
 
         [RelayCommand]
         private void OnMouseEnterItem(ExplorerItem item)
         {
             if (!SettingsHelper.Settings.NavigateOnHover) return;
-            
-            if (item == null) return;
 
-            if (item.IsDirectory)
-            {
-                UnregisterChildContainer();
-                var containerViewModel = CreateContainerNode(item.FullPath);
-                RegisterContainer(containerViewModel);
-            }
+            NavigateToNode(item, false);
         }
 
         [RelayCommand]
@@ -247,6 +226,7 @@ namespace DirectoryDash.ViewModels
             }
         }
 
+
         private void UnregisterChildContainer()
         {
             if (ChildContainer == null) return;
@@ -260,6 +240,23 @@ namespace DirectoryDash.ViewModels
             ChildContainer.UnregisterContainer();
         
             ChildContainer = null;
+        }
+
+        private void NavigateToNode(ExplorerItem item, bool isClick = true)
+        {
+            if (item == null) return;
+
+            if (item.IsDirectory)
+            {
+                UnregisterChildContainer();
+
+                var vm = CreateContainerNode(item.FullPath);
+                RegisterContainer(vm);
+            }
+            else if (isClick)
+            {
+                _explorerService.OpenFile(item.FullPath);
+            }
         }
     }
 }

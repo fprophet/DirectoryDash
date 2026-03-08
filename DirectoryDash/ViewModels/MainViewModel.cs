@@ -22,21 +22,20 @@ namespace DirectoryDash.ViewModels
         [ObservableProperty]
         private ContainerViewModel rootContainer;
 
-        private string title;
         private IconService _iconService;
         private ExplorerService _explorerService;
         private Func<ExplorerContainerData, ContainerViewModel> _containerVmFactory;
 
         public ContainersStore ContainersStore { get; }
 
-        private ContainersStore _containersStore;
         [ObservableProperty]
         private bool isListVisible = false;
 
         [ObservableProperty]
-        private int parentListMaxWidth = 400;
-        [ObservableProperty]
         private int currentIndex = 0;
+
+        [ObservableProperty]
+        private double listHolderWidth = Vars.ScreenWidth - 200; //100 margin l+r
 
         public ICommand OnMouseLeaveCommand => new AsyncRelayCommand(OnMouseLeave);
         public ICommand OnMouseEnterCommand => new AsyncRelayCommand(OnMouseEnter);
@@ -60,7 +59,6 @@ namespace DirectoryDash.ViewModels
             var sourceDirectory = SettingsHelper.Settings.SavedPaths.First();
             RootContainer = _containerVmFactory(new ExplorerContainerData() { ElementPath = sourceDirectory });
         }
-
 
         private void CreateRootSelectionContainer()
         {
@@ -98,10 +96,11 @@ namespace DirectoryDash.ViewModels
             if (RootContainer == null) return;
 
             CurrentIndex = RootContainer.ContainerData.Index = 0;
-            RootContainer.ContainerData.XCoord = _iconService.IconX - RootContainer.ContainerData.Width - 200;
-            RootContainer.ContainerData.YCoord = _iconService.IconY - RootContainer.ContainerData.Height - 100;
             ContainersStore.AllContainers.Add(RootContainer);
+
             IsListVisible = true;
+
+            Vars.Reset();
         }
 
     }

@@ -1,4 +1,5 @@
 ﻿using DirectoryDash.Factories;
+using DirectoryDash.Helpers;
 using DirectoryDash.SettingsViewModels.ViewModels;
 using DirectoryDash.ViewModels;
 using DirectoryDash.Views;
@@ -65,10 +66,12 @@ namespace DirectoryDash.Services
                 var (x, y) = GetCurrentMousePosition();
                 IconX = x;
                 IconY = y;
-                double width = SystemParameters.PrimaryScreenWidth;
-                double height = SystemParameters.PrimaryScreenHeight;
-                IconX = width;
-                IconY = height;
+
+                Vars.GetStartCoordinates(x,y);
+
+                Vars.MouseYPosition = y;
+                //IconX = width;
+                //IconY = height;
 
                 OnIconClick();
             }

@@ -12,4 +12,10 @@ namespace DirectoryDash.Enums
         SourceDirectories,
         Info
     }
+
+    public enum Direction
+    {
+        LTR,
+        RTL
+    }
 }

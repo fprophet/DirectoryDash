@@ -12,9 +12,9 @@
     <converters:ContainerLinkConverter x:Key="ContainerLinkConverter" />
     <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" />
     <BooleanToVisibilityConverter x:Key="BoolToVis" />
-   
-    
-    <DataTemplate x:Key="ContainerTemplate">
+
+
+    <DataTemplate x:Key="ContainerItemListTemplate">
         <Border Padding="6,3" ToolTip="{Binding FullPath}">
 
             <Grid HorizontalAlignment="Stretch" Background="Transparent">
@@ -62,10 +62,45 @@
             </Grid>
         </Border>
     </DataTemplate>
+    
+    <DataTemplate x:Key="ContainerListTemplate">
+        <Border Padding="6,3" ToolTip="{Binding ContainerData.ElementPath}">
+
+            <Grid HorizontalAlignment="Stretch" Background="Transparent">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <i:Interaction.Triggers>
+                    
+                    <i:EventTrigger EventName="MouseEnter">
+                        <i:InvokeCommandAction Command="{Binding DataContext.OnMouseEnterItemCommand,
+                            RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                            CommandParameter="{Binding}"/>
+                    </i:EventTrigger>
+                    
+                    <i:EventTrigger EventName="MouseLeftButtonDown">
+                        <i:InvokeCommandAction 
+                        CommandParameter="{Binding}"
+                        Command="{Binding DataContext.OnContainerClickCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"/>
+
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="{Binding Icon}" Width="20" Height="20" Margin="2" />
+                    <TextBlock Text="{Binding ContainerData.ElementName}" 
+                        Visibility="{Binding IsEditing, Converter={StaticResource InverseBoolToVisibilityConverter}}"
+                        Foreground="#E0E0E0" 
+                        FontSize="13" 
+                        Margin="2"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </DataTemplate>
 
     <DataTemplate DataType="{x:Type vm:ContainerViewModel}">
 
-    <material:Card Background="#2A2A2A"
+        <material:Card Background="#2A2A2A"
             material:ElevationAssist.Elevation="Dp4"
             Foreground="White"
             Padding="0"
@@ -176,7 +211,7 @@
                     ScrollViewer.CanContentScroll="False"
                     Style="{StaticResource MaterialDesignListView}"
                     ItemsSource="{Binding ItemListViewModel.ItemsView}"
-                    ItemTemplate="{StaticResource ContainerTemplate}"
+                    ItemTemplate="{StaticResource ContainerItemListTemplate}"
                     ItemContainerStyle="{StaticResource ListViewItemWithContextMenu}"
                     Width="{Binding ContainerData.Width}"
                     Height="{Binding ContainerData.Height}" />
@@ -184,4 +219,5 @@
             </Grid>
         </material:Card>
     </DataTemplate>
+
 </ResourceDictionary>
