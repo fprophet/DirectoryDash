@@ -7,6 +7,7 @@ using DirectoryDash.Views;
 using DirectoryDash.Views.SettingsViews;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,16 +33,30 @@ namespace DirectoryDash.Services
             _itemFactory = itemFactory;
 
             _icon = new NotifyIcon();
-            _icon.Icon = new Icon("tray.ico");
+            _icon.Icon = new Icon("Resources/tray.ico");
             _icon.Visible = true;
             _icon.Click += HandleClick;
             _icon.ContextMenuStrip = new ContextMenuStrip();
-            _icon.ContextMenuStrip.Items.Add("About", null, OpenAbout);
-            _icon.ContextMenuStrip.Items.Add("New Path", null, AddPathAndOpen);
-            _icon.ContextMenuStrip.Items.Add("Settings", null, OpenSettingsWindow);
+            _icon.ContextMenuStrip.Items.Add("About", GetImage("info.png"), OpenAbout);
+            _icon.ContextMenuStrip.Items.Add("New Path", GetImage("folder-copy.png"), AddPathAndOpen);
+            _icon.ContextMenuStrip.Items.Add("Settings", GetImage("settings.png"), OpenSettingsWindow);
             _icon.ContextMenuStrip.Items.Add("-", null);
-            _icon.ContextMenuStrip.Items.Add("Exit", null, (s, args) => System.Windows.Application.Current.Shutdown());
+            _icon.ContextMenuStrip.Items.Add("Exit", GetImage("exit.png"), CloseApp);
             _icon.ContextMenuStrip.Show();
+        }
+
+        private void CloseApp(object? sender, EventArgs e) => System.Windows.Application.Current.Shutdown();
+
+        private Image? GetImage(string v)
+        {
+            try
+            {
+                return Image.FromFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/Images/", v));
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         private void OpenSettingsWindow(object? sender, EventArgs e) => _settingsService.OpenSettingsWindow();

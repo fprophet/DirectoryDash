@@ -61,7 +61,6 @@ namespace DirectoryDash
 
         protected override void OnExit(ExitEventArgs e)
         {
-            //_icon?.Dispose();
             base.OnExit(e);
         }
     }

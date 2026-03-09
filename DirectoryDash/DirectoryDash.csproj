@@ -10,6 +10,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\Images\exit.png" />
+    <None Remove="Resources\Images\folder-copy.png" />
+    <None Remove="Resources\Images\info.png" />
+    <None Remove="Resources\Images\settings.png" />
     <None Remove="tray.ico" />
   </ItemGroup>
 
@@ -22,9 +26,21 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="tray.ico">
+    <EmbeddedResource Include="Resources\Images\exit.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Images\folder-copy.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Images\info.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Images\settings.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\tray.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>
