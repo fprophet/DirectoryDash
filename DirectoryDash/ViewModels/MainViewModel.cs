@@ -25,6 +25,7 @@ namespace DirectoryDash.ViewModels
         private IconService _iconService;
         private ExplorerService _explorerService;
         private Func<ExplorerContainerData, ContainerViewModel> _containerVmFactory;
+        private KeyService _keyService;
 
         public ContainersStore ContainersStore { get; }
 
@@ -37,6 +38,10 @@ namespace DirectoryDash.ViewModels
         [ObservableProperty]
         private double listHolderWidth = Vars.ScreenWidth - 200; //100 margin l+r
 
+        public HotKey ClearViewHotKey => SettingsHelper.Settings.ClearViewHotKey;
+        public HotKey NavigationBlockHotKey => SettingsHelper.Settings.NavigationBlockHotKey;
+
+
         public ICommand OnMouseLeaveCommand => new AsyncRelayCommand(OnMouseLeave);
         public ICommand OnMouseEnterCommand => new AsyncRelayCommand(OnMouseEnter);
 
@@ -44,11 +49,13 @@ namespace DirectoryDash.ViewModels
             ExplorerService explorerService,
             IconService iconService,
             ContainersStore containersStore,
+            KeyService keyService,
             Func<ExplorerContainerData, ContainerViewModel> containerVmFactory)
         {
             _iconService = iconService;
             _explorerService = explorerService;
             _containerVmFactory = containerVmFactory;
+            _keyService = keyService;
             ContainersStore = containersStore;
 
             SetSubscribers();
@@ -78,10 +85,14 @@ namespace DirectoryDash.ViewModels
             _explorerService.Clear += ClearView;
         }
 
-        private void ClearView()
+        public void BlockNavigationStart()
         {
-            ClearContainers();
-            IsListVisible = false;
+            ContainersStore.NavigationBlocked = true;
+        }
+
+        public void BlockNavigationEnd()
+        {
+            ContainersStore.NavigationBlocked = false;
         }
 
         private void IconService_HandleClick(object? sender, EventArgs e)
@@ -99,9 +110,46 @@ namespace DirectoryDash.ViewModels
             ContainersStore.AllContainers.Add(RootContainer);
 
             IsListVisible = true;
-
+            BlockNavigationEnd();
             Vars.Reset();
         }
 
+        [RelayCommand]
+        private void ClearView()
+        {
+            ClearContainers();
+            IsListVisible = false;
+        }
+
+        [RelayCommand]
+        private void KeyDown(InputEventArgs e)
+        {
+            if (e == null) return;
+
+            if (e is not System.Windows.Input.KeyEventArgs args) return;
+
+            if (_keyService.MatchGesture(args, NavigationBlockHotKey) && !SettingsHelper.Settings.ToggleNavigation)
+                BlockNavigationStart();
+
+            if (_keyService.MatchGesture(args, ClearViewHotKey))
+                ClearView();
+        }
+
+        [RelayCommand]
+        private void KeyUp(InputEventArgs e)
+        {
+            if (e is not System.Windows.Input.KeyEventArgs args) return;
+
+            if (_keyService.MatchGesture(args, NavigationBlockHotKey) && SettingsHelper.Settings.ToggleNavigation)
+                ToggleNavigation();
+            else if(_keyService.MatchGesture(args, NavigationBlockHotKey) && !SettingsHelper.Settings.ToggleNavigation)
+                BlockNavigationEnd();
+        }
+
+        private void ToggleNavigation()
+        {
+            ContainersStore.NavigationBlocked = !ContainersStore.NavigationBlocked;
+
+        }
     }
 }

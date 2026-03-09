@@ -107,10 +107,14 @@ namespace DirectoryDash.Services
         {
             try
             {
+                if (!SettingsHelper.Settings.ClearViewOnLeave) return;
+
+                var delay = SettingsHelper.Settings.ClearViewDelay;
+
                 _clearViewCT = new CancellationTokenSource();
-                await Task.Delay(2000, _clearViewCT.Token);
-                //if (!_clearViewCT.IsCancellationRequested)
-                //    Clear?.Invoke();
+                await Task.Delay(delay, _clearViewCT.Token);
+                if (!_clearViewCT.IsCancellationRequested)
+                    Clear?.Invoke();
             }
             catch (TaskCanceledException) { }
         }

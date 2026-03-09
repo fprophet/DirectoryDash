@@ -11,11 +11,14 @@ using System.Threading.Tasks;
 
 namespace DirectoryDash.Stores
 {
-    internal class ContainersStore : ObservableObject
+    internal partial class ContainersStore : ObservableObject
     {
         public ObservableCollection<ContainerViewModel> AllContainers { get; } = new ObservableCollection<ContainerViewModel>();
 
         public ObservableCollection<ContainerViewModel> Workspace { get; } = new ObservableCollection<ContainerViewModel>();
+
+        [ObservableProperty]
+        private bool navigationBlocked = false;
 
         public bool CanFitNewContainer()
         {

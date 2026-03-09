@@ -8,7 +8,7 @@
         xmlns:enums="clr-namespace:DirectoryDash.Enums"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
-        Title="Settings" Height="500" Width="600"
+        Title="Settings" Height="700" Width="800"
         Background="#FF1E1E1E"
         WindowStartupLocation="CenterScreen"
         FontFamily="Segoe UI">

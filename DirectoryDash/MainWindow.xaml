@@ -27,19 +27,42 @@
             </Style>
         </ResourceDictionary>
     </Window.Resources>
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="PreviewKeyDown">
+            <i:InvokeCommandAction Command="{Binding KeyDownCommand}" PassEventArgsToCommand="True" />
+        </i:EventTrigger>
+        <i:EventTrigger EventName="PreviewKeyUp">
+            <i:InvokeCommandAction Command="{Binding KeyUpCommand}" PassEventArgsToCommand="True"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    
     <Grid>
         <Canvas HorizontalAlignment="Stretch"
                 Visibility="{Binding IsListVisible, Converter={StaticResource BoolToVis}}">
 
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="KeyDown">
-                    <i:InvokeCommandAction Command="{Binding OnMainWindowKeyDow}" />
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
-
-            <ScrollViewer Background="Transparent" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Hidden" Margin="100,0"
-                          Canvas.Bottom="100" Canvas.Right="0" Padding="50" Width="{Binding ListHolderWidth}" Height="400" VerticalAlignment="Stretch">
-
+            
+            <ScrollViewer Background="Transparent" 
+                          HorizontalScrollBarVisibility="Auto"
+                          VerticalScrollBarVisibility="Hidden" 
+                          VerticalContentAlignment="Stretch"
+                          Margin="100,0"
+                          Canvas.Bottom="100"
+                          Canvas.Right="0"
+                          Padding="20"
+                          Width="{Binding ListHolderWidth}" 
+                          Height="450" 
+                          VerticalAlignment="Stretch">
+                
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseLeave">
+                        <i:InvokeCommandAction Command="{Binding OnMouseLeaveCommand}" />
+                    </i:EventTrigger>
+                    <i:EventTrigger EventName="MouseEnter">
+                        <i:InvokeCommandAction Command="{Binding OnMouseEnterCommand}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                
                 <ScrollViewer.Resources>
                     <Style TargetType="ScrollBar" BasedOn="{StaticResource MaterialDesignScrollBar}">
                         <Setter Property="Background" Value="Transparent"/>
@@ -69,7 +92,7 @@
                 <ItemsControl ItemsSource="{Binding ContainersStore.AllContainers}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <DockPanel LastChildFill="False" />
+                            <DockPanel LastChildFill="False" VerticalAlignment="Stretch"/>
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
 
@@ -89,13 +112,6 @@
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="Loaded">
                                         <i:InvokeCommandAction Command="{Binding OnLoadedCommand}" />
-                                    </i:EventTrigger>
-
-                                    <i:EventTrigger EventName="MouseLeave">
-                                        <i:InvokeCommandAction Command="{Binding DataContext.OnMouseLeaveCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
-                                    </i:EventTrigger>
-                                    <i:EventTrigger EventName="MouseEnter">
-                                        <i:InvokeCommandAction Command="{Binding DataContext.OnMouseEnterCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
                                     </i:EventTrigger>
                                 </i:Interaction.Triggers>
 

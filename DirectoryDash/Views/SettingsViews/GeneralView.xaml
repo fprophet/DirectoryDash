@@ -4,66 +4,173 @@
              xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              Background="Transparent">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <Style TargetType="TextBlock">
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+    </UserControl.Resources>
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="PreviewKeyUp">
+            <i:InvokeCommandAction Command="{Binding KeyUpCommand}" PassEventArgsToCommand="True" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <Grid>
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <Grid Margin="24">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+        <Grid x:Name="Modal" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Panel.ZIndex="1111"
+                  Focusable="True"
+                  IsHitTestVisible="True"
+                  Background="Transparent"
+              Visibility="{Binding IsModalVisible, Converter={StaticResource BoolToVisibilityConverter}}">
 
-            <TextBlock Text="General Settings"
+            
+            <Border Background="LightGray"  CornerRadius="8" Margin="24" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <TextBlock Text="Press any key or combination of keys: Ctr + C" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            </Border>
+        </Grid>
+        
+        
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <Grid Margin="24">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="General Settings"
                        FontSize="22"
                        FontWeight="SemiBold"
                        Foreground="White"
                        Margin="0,0,0,16"/>
 
-            <Border Background="#FF2A2A2A" Grid.Row="1"
+                <Border Background="#FF2A2A2A" Grid.Row="1"
                     CornerRadius="8"
                     Padding="16">
 
-                <StackPanel>
+                    <StackPanel>
 
-                    <StackPanel Margin="0,0,0,12">
-                        <CheckBox Content="Start application on system startup"
+                        <StackPanel Margin="0,0,0,0" >
+                            <CheckBox Content="Start application on system startup"
                                   IsChecked="{Binding OnStartup, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                   Foreground="White"/>
 
-                        <TextBlock Text="Launch the app automatically when Windows starts."
+                            <TextBlock Text="Launch the app automatically when Windows starts."
                                    Foreground="#FFAAAAAA"
                                    FontSize="12"
                                    Margin="28,2,0,0"/>
-                    </StackPanel>
+                        </StackPanel>
 
-                    <StackPanel Margin="0,0,0,12">
-                        <CheckBox Content="Show directories only"
+                        <StackPanel Margin="0,15,0,0" >
+                            <CheckBox Content="Show directories only"
                                   IsChecked="{Binding DirectoriesOnly, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                   Foreground="White"/>
 
-                        <TextBlock Text="Hide files and display only folders."
+                            <TextBlock Text="Hide files and display only folders."
                                    Foreground="#FFAAAAAA"
                                    FontSize="12"
                                    Margin="28,2,0,0"/>
-                    </StackPanel>
+                        </StackPanel>
 
-                    <StackPanel>
-                        <CheckBox Content="Navigate directories on hover"
+                        <StackPanel Margin="0,15,0,0" >
+                            <CheckBox Content="Navigate directories on hover"
                                   IsChecked="{Binding NavigateOnHover, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                   Foreground="White"/>
 
-                        <TextBlock Text="Automatically open folders when hovering over them."
+                            <TextBlock Text="Automatically open folders when hovering over them."
                                    Foreground="#FFAAAAAA"
                                    FontSize="12"
                                    Margin="28,2,0,0"/>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,15,0,0" >
+                            <CheckBox Content="Clear view when mouse leaves area"
+                                  IsChecked="{Binding ClearViewOnLeave, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  Foreground="White"/>
+
+                            <TextBlock Text="Auto clear the view after the mouse leaves the container area."
+                                   Foreground="#FFAAAAAA"
+                                   FontSize="12"
+                                   Margin="28,2,0,0"/>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,15,0,0" IsEnabled="{Binding ClearViewOnLeave, UpdateSourceTrigger=PropertyChanged}">
+                            <StackPanel Orientation="Horizontal">
+
+                                <TextBox Text="{Binding ClearViewDelay, UpdateSourceTrigger=PropertyChanged}" Width="100" Margin="10,0"
+                                  Foreground="White"/>
+                                <TextBlock Text="ms" VerticalAlignment="Center" Foreground="#FFAAAAAA"/>
+                            </StackPanel>
+
+                            <TextBlock Text="How many milliseconds to wait before clearing the view after the mouse leaves the container area."
+                                   Foreground="#FFAAAAAA"
+                                   FontSize="12"
+                                   Margin="28,5,0,0"/>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,15,0,0" >
+                            <StackPanel Orientation="Horizontal">
+
+                                <TextBlock Text="Hotkey to clear the view: " Margin="10,0,0,0"
+                                  Foreground="White"/>
+
+                                <TextBlock Text="{Binding ClearViewHotKeyString, UpdateSourceTrigger=PropertyChanged}"  Margin="10,0"
+                                  Foreground="White"/>
+
+                                <Button Content="Change" Command="{Binding ChangeClearViewHkCommand}"
+                                Style="{StaticResource MaterialDesignRaisedButton}"  Margin="0"
+                                Height="24" Width="60" 
+                                Padding="4,0" 
+                                FontSize="12"/>
+                            </StackPanel>
+
+                            <TextBlock Text="Use a key or a combination of keys to clear the view."
+                                   Foreground="#FFAAAAAA"
+                                   FontSize="12"
+                                   Margin="28,5,0,0"/>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,15,0,0" >
+                            <StackPanel Orientation="Horizontal">
+
+                                <TextBlock Text="Hotkey to block navigation: " Margin="10,0,0,0"
+                                  Foreground="White"/>
+
+                                <TextBlock Text="{Binding NavigationBlockHotKeyString, UpdateSourceTrigger=PropertyChanged}"  Margin="10,0"
+                                  Foreground="White"/>
+
+                                <Button Content="Change" Command="{Binding ChangeNavigationBlockHkCommand}"
+                                Style="{StaticResource MaterialDesignRaisedButton}"  Margin="0"
+                                Height="24" Width="60" 
+                                Padding="4,0" 
+                                FontSize="12"/>
+                            </StackPanel>
+
+                            <TextBlock Text="Use a key or a combination of keys to block navigation and closing folders."
+                                   Foreground="#FFAAAAAA"
+                                   FontSize="12"
+                                   Margin="28,5,0,0"/>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,15,0,0" >
+                            <CheckBox Content="Toggle navigation block"
+                                  IsChecked="{Binding ToggleNavigation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  Foreground="White"/>
+
+                            <TextBlock Text="Check if you want navigation blocking to be turned on/off by pressing the hotkey. Otherwise hold to block."
+                                   Foreground="#FFAAAAAA"
+                                   FontSize="12"
+                                   Margin="28,2,0,0"/>
+                        </StackPanel>
+
                     </StackPanel>
+                </Border>
 
-                </StackPanel>
-            </Border>
-
-        </Grid>
-    </ScrollViewer>
+            </Grid>
+        </ScrollViewer>
+    </Grid>
 </UserControl>

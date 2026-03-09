@@ -101,7 +101,10 @@
     <DataTemplate DataType="{x:Type vm:ContainerViewModel}">
 
         <material:Card Background="#2A2A2A"
-            material:ElevationAssist.Elevation="Dp4"
+                       VerticalAlignment="Stretch"
+                        material:ElevationAssist.Elevation="Dp4"
+                        Width="{Binding ContainerData.Width}"
+                       Height="{Binding ContainerData.Height}"
             Foreground="White"
             Padding="0"
             Margin="8">
@@ -188,7 +191,7 @@
                             </Button>
                         </Grid>
 
-                        <TextBox Text="{Binding ItemListViewModel.SearchText, UpdateSourceTrigger=PropertyChanged}" material:HintAssist.Hint="{Binding ContainerData.ElementName}"
+                            <TextBox Text="{Binding ItemListViewModel.SearchText, UpdateSourceTrigger=PropertyChanged}" material:HintAssist.Hint="{Binding ContainerData.ElementName}"
                                          VerticalAlignment="Center" Grid.Column="1" Foreground="White"
                                          HorizontalAlignment="Stretch" Style="{StaticResource MaterialDesignTextBox}"/>
                             
@@ -206,15 +209,16 @@
                 <ListView x:Name="ContainerListView"
                     Grid.Row="2" 
                     Padding="10"
+                     Margin="0"
                     VerticalContentAlignment="Stretch"
                     HorizontalContentAlignment="Stretch"
                     ScrollViewer.CanContentScroll="False"
+                    ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                    VirtualizingPanel.IsVirtualizing="True"
                     Style="{StaticResource MaterialDesignListView}"
                     ItemsSource="{Binding ItemListViewModel.ItemsView}"
                     ItemTemplate="{StaticResource ContainerItemListTemplate}"
-                    ItemContainerStyle="{StaticResource ListViewItemWithContextMenu}"
-                    Width="{Binding ContainerData.Width}"
-                    Height="{Binding ContainerData.Height}" />
+                    ItemContainerStyle="{StaticResource ListViewItemWithContextMenu}"/>
                         
             </Grid>
         </material:Card>

@@ -246,6 +246,8 @@ namespace DirectoryDash.ViewModels
         {
             if (item == null) return;
 
+            if( ContainersStore.NavigationBlocked ) return;
+
             if (item.IsDirectory)
             {
                 UnregisterChildContainer();

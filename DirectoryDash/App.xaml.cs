@@ -29,6 +29,7 @@ namespace DirectoryDash
             serviceCollection.AddSingleton<ExplorerService>();
             serviceCollection.AddSingleton<IconService>();
             serviceCollection.AddSingleton<SettingsService>();
+            serviceCollection.AddSingleton<KeyService>();
             serviceCollection.AddSingleton<ContainersStore>();
 
             serviceCollection.AddTransient<MainWindow>();

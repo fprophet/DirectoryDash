@@ -1,6 +1,7 @@
 ﻿using DirectoryDash.Models;
+using System.Windows.Input;
 using System.IO;
-using System.Text.Json;
+using System.Text.Json;      
 
 
 namespace DirectoryDash.Helpers
@@ -30,12 +31,20 @@ namespace DirectoryDash.Helpers
 
         private static void LoadSettings()
         {
-            var settings = File.ReadAllText(SettingsFile);
-            var json = JsonSerializer.Deserialize<Settings>(settings);
+            try
+            {
 
-            Settings = json ?? new Settings();
+                var settings = File.ReadAllText(SettingsFile);
+                var json = JsonSerializer.Deserialize<Settings>(settings);
 
-            CheckSavedPaths();
+                Settings = json ?? new Settings();
+
+                CheckSavedPaths();
+            }
+            catch (Exception ex)
+            {
+                CreateDefaultSettings();
+            }
         }
 
         private static void CheckSavedPaths()

@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using DirectoryDash.ViewModels;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -8,6 +9,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace DirectoryDash
 {
@@ -16,16 +18,9 @@ namespace DirectoryDash
     /// </summary>
     public partial class MainWindow : Window
     {
-
         public MainWindow()
         {
             InitializeComponent();
-        }
-
-        protected override void OnDeactivated(EventArgs e)
-        {
-            base.OnDeactivated(e);
-            System.Diagnostics.Trace.WriteLine("Window Deactivated!");
         }
     }
 }

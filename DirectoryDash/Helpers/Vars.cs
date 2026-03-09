@@ -14,7 +14,7 @@ namespace DirectoryDash.Helpers
 
         public static double ScreenHeight => SystemParameters.PrimaryScreenHeight;
 
-        public static double ContainerHeight { get; set; } = 300;
+        public static double ContainerHeight { get; set; } = 400;
 
         public static double ContainerWidth { get; set; } = 300;
 

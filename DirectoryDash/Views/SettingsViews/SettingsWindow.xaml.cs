@@ -23,5 +23,6 @@ namespace DirectoryDash.Views.SettingsViews
         {
             InitializeComponent();
         }
+
     }
 }

@@ -9,9 +9,11 @@ using DirectoryDash.ViewModels.SettingsViewModels;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace DirectoryDash.SettingsViewModels.ViewModels
 {
@@ -82,8 +84,15 @@ namespace DirectoryDash.SettingsViewModels.ViewModels
             SettingsHelper.Settings.OnStartup = GeneralViewModel.OnStartup;
             SettingsHelper.Settings.DirectoriesOnly = GeneralViewModel.DirectoriesOnly;
             SettingsHelper.Settings.NavigateOnHover = GeneralViewModel.NavigateOnHover;
+            SettingsHelper.Settings.ClearViewDelay = GeneralViewModel.ClearViewDelay;
+            SettingsHelper.Settings.ClearViewOnLeave = GeneralViewModel.ClearViewOnLeave;
+            SettingsHelper.Settings.ClearViewHotKey = GeneralViewModel.ClearViewHotKey;
+            SettingsHelper.Settings.NavigationBlockHotKey = GeneralViewModel.NavigationBlockHotKey;
+            SettingsHelper.Settings.ToggleNavigation = GeneralViewModel.ToggleNavigation;
 
             SettingsHelper.SaveSettings();
+
+            System.Windows.MessageBox.Show("Settings saved.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         [RelayCommand]
