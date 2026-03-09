@@ -16,7 +16,12 @@
 
     <DataTemplate x:Key="ContainerItemListTemplate">
         <Border Padding="6,3" ToolTip="{Binding FullPath}">
-
+            <Border.InputBindings>
+                <KeyBinding Key="F2"
+                Modifiers="Control"
+                Command="{Binding DataContext.StartRenameItemCommand, RelativeSource={RelativeSource AncestorType=ListView}}"
+                CommandParameter="{Binding }" />
+            </Border.InputBindings>
             <Grid HorizontalAlignment="Stretch" Background="Transparent">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -101,10 +106,11 @@
     <DataTemplate DataType="{x:Type vm:ContainerViewModel}">
 
         <material:Card Background="#2A2A2A"
-                       VerticalAlignment="Stretch"
-                        material:ElevationAssist.Elevation="Dp4"
-                        Width="{Binding ContainerData.Width}"
-                       Height="{Binding ContainerData.Height}"
+            VerticalAlignment="Stretch"
+            material:ElevationAssist.Elevation="Dp4"
+            Width="{Binding ContainerData.Width}"
+            Height="{Binding ContainerData.Height}"
+            Visibility="{Binding ContainerData.IsVisible, Converter={StaticResource BoolToVis}}"
             Foreground="White"
             Padding="0"
             Margin="8">
@@ -127,7 +133,22 @@
                         </Grid.ColumnDefinitions>
 
                         <!--<TextBlock Text="Your saved paths" Foreground="White" VerticalAlignment="Center"/>-->
-
+                        <Button Style="{StaticResource MaterialDesignToolButton}"
+                             Width="36" Height="36"
+                             ToolTip="Menu" HorizontalAlignment="Left"
+                             behaviors:LeftClickContextMenuBehavior.OpenOnLeftClick="True"
+                             ContextMenuService.IsEnabled="True">
+                            <material:PackIcon Kind="Menu" Foreground="White"/>
+                            <Button.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Add Navigation Path" Command="{Binding AddNewPathCommand}"  >
+                                        <MenuItem.Icon>
+                                            <material:PackIcon Kind="FolderPlusOutline" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                </ContextMenu>
+                            </Button.ContextMenu>
+                        </Button>
                         <Button Style="{StaticResource MaterialDesignToolButton}"
                             Command="{Binding UnregisterContainerCommand}"
                             Grid.Column="1" HorizontalAlignment="Right"
@@ -205,6 +226,16 @@
                         </Border>
                         
                         <Separator Grid.Row="1" Background="White" Height="0.5"/>
+
+                <ProgressBar
+                    Width="50"
+                    Height="50" Grid.Row="2"
+                    IsIndeterminate="True"
+                    Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}}"
+                    Style="{StaticResource MaterialDesignCircularProgressBar}" 
+                    Foreground="DeepSkyBlue"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"/>
 
                 <ListView x:Name="ContainerListView"
                     Grid.Row="2" 

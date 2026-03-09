@@ -8,7 +8,7 @@ namespace DirectoryDash.Helpers
 {
     internal class SettingsHelper
     {
-        public static readonly string Directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "DirectoryDash");
+        public static readonly string Directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "DirectoryDash");
         public static readonly string SettingsFile = Path.Combine(Directory, "settings.json");
 
         public static Settings Settings { get; private set; } = new Settings();

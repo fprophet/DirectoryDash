@@ -22,6 +22,7 @@ namespace DirectoryDash.SettingsViewModels.ViewModels
         private SettingsService _settingsService;
         private ItemFactory _itemFactory;
         private ExplorerService _explorerService;
+        private DialogBoxService _dialogBoxService;
 
         public GeneralViewModel GeneralViewModel { get; }
         public SourceDirectoriesViewModel SourceDirectoriesViewModel { get; }
@@ -37,6 +38,7 @@ namespace DirectoryDash.SettingsViewModels.ViewModels
             ExplorerService explorerService,
             SettingsService settingsService,
             GeneralViewModel generalViewModel,
+            DialogBoxService dialogBoxService,
             SourceDirectoriesViewModel sourceDirectoriesViewModel,
             InfoViewModel infoViewModel,
             ItemFactory itemFactory)
@@ -44,6 +46,7 @@ namespace DirectoryDash.SettingsViewModels.ViewModels
             _settingsService = settingsService;
             _itemFactory = itemFactory;
             _explorerService = explorerService;
+            _dialogBoxService = dialogBoxService;
 
             GeneralViewModel = generalViewModel;
             SourceDirectoriesViewModel = sourceDirectoriesViewModel;
@@ -54,7 +57,7 @@ namespace DirectoryDash.SettingsViewModels.ViewModels
 
 
         [RelayCommand]
-        private void ChangeSection(SettingsSection section)
+        public void ChangeSection(SettingsSection section)
         {
             switch (section)
             {
@@ -92,7 +95,7 @@ namespace DirectoryDash.SettingsViewModels.ViewModels
 
             SettingsHelper.SaveSettings();
 
-            System.Windows.MessageBox.Show("Settings saved.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+            _dialogBoxService.InfoBox("Settings saved.");
         }
 
         [RelayCommand]

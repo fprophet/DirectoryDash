@@ -36,6 +36,6 @@ namespace DirectoryDash.Models
         public HotKey navigationBlockHotKey = new HotKey() { Modifier = ModifierKeys.Control };
 
         [ObservableProperty]
-        public HotKey clearViewHotKey = new HotKey() { Key = Key.C, Modifier = ModifierKeys.Control };
+        public HotKey clearViewHotKey = new HotKey() { Key = Key.Escape };
     }
 }

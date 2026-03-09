@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:DirectoryDash.Views.SettingsViews"
+             xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid Margin="20,0,20,20">
@@ -13,11 +14,16 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Text="Source Directories"
-            Foreground="White"
-            FontSize="18"
-            FontWeight="Bold"
-            Margin="0,0,0,10"/>
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+            <material:PackIcon Kind="Folders" Width="24" Height="24" Margin="0,0,10,0"
+                                  VerticalAlignment="Center" Foreground="White"/>
+            <TextBlock Text="Source Directories" VerticalAlignment="Center"
+                        FontSize="22"
+                        FontWeight="SemiBold"
+                        Foreground="White"
+                        Margin="0,0,0,0"/>
+        </StackPanel>
+
 
         <Grid Grid.Row="1">
             <Grid.RowDefinitions>
@@ -26,9 +32,14 @@
             </Grid.RowDefinitions>
 
             <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                <Button Content="Browse" Width="80" Height="35"
+                <Button Height="35"
                  Command="{Binding BrowseCommand}"
-                 Style="{StaticResource MaterialDesignRaisedButton}"/>
+                 Style="{StaticResource MaterialDesignRaisedButton}">
+                    <StackPanel Orientation="Horizontal">
+                        <material:PackIcon Kind="Folder" Width="24" Height="24" Margin="0,0,10,0" VerticalAlignment="Center" Foreground="White" />
+                        <TextBlock Text="Browse" VerticalAlignment="Center" Foreground="White"/>
+                    </StackPanel>
+                </Button>
             </StackPanel>
 
             <Border Grid.Row="1" Background="#2D2D2D" CornerRadius="5" Padding="5" BorderBrush="#444" BorderThickness="1">
@@ -43,12 +54,21 @@
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Text="{Binding}" Foreground="White" VerticalAlignment="Center"
                                         ToolTip="{Binding}"/>
-                                    <Button Content="Remove" Grid.Column="1"
-                                     Command="{Binding DataContext.RemovePathCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                     CommandParameter="{Binding}"
-                                     Height="25"
-                                     Margin="5,0,0,0"
-                                     Style="{StaticResource MaterialDesignFlatButton}"/>
+                                    <Button Grid.Column="1"
+                                         Command="{Binding DataContext.RemovePathCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                         CommandParameter="{Binding}"
+                                         Height="25"
+                                         Margin="5,0,0,0"
+                                         Style="{StaticResource MaterialDesignFlatButton}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <material:PackIcon Kind="Trash" 
+                                                               Width="24" Height="24"
+                                                               Margin="0,0,10,0"
+                                                               VerticalAlignment="Center"
+                                                               Foreground="Red" />
+                                            <TextBlock Text="Remove" VerticalAlignment="Center" Foreground="Red"/>
+                                        </StackPanel>
+                                    </Button>
                                 </Grid>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>

@@ -30,6 +30,8 @@ namespace DirectoryDash.Services
             _containersStore = containersStore;
         }
 
+        public void ClearView() => Clear?.Invoke();
+
         public List<ExplorerItem> GetNodes(string path)
         {
             try
@@ -114,7 +116,7 @@ namespace DirectoryDash.Services
                 _clearViewCT = new CancellationTokenSource();
                 await Task.Delay(delay, _clearViewCT.Token);
                 if (!_clearViewCT.IsCancellationRequested)
-                    Clear?.Invoke();
+                    ClearView();
             }
             catch (TaskCanceledException) { }
         }

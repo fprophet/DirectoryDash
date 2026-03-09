@@ -1,4 +1,5 @@
-﻿using DirectoryDash.Factories;
+﻿using DirectoryDash.Enums;
+using DirectoryDash.Factories;
 using DirectoryDash.Helpers;
 using DirectoryDash.SettingsViewModels.ViewModels;
 using DirectoryDash.ViewModels;
@@ -35,12 +36,23 @@ namespace DirectoryDash.Services
             _icon.Visible = true;
             _icon.Click += HandleClick;
             _icon.ContextMenuStrip = new ContextMenuStrip();
-            _icon.ContextMenuStrip.Items.Add("Settings", null, _settingsService.OpenSettingsWindow);
+            _icon.ContextMenuStrip.Items.Add("About", null, OpenAbout);
+            _icon.ContextMenuStrip.Items.Add("New Path", null, AddPathAndOpen);
+            _icon.ContextMenuStrip.Items.Add("Settings", null, OpenSettingsWindow);
             _icon.ContextMenuStrip.Items.Add("-", null);
             _icon.ContextMenuStrip.Items.Add("Exit", null, (s, args) => System.Windows.Application.Current.Shutdown());
             _icon.ContextMenuStrip.Show();
         }
 
+        private void OpenSettingsWindow(object? sender, EventArgs e) => _settingsService.OpenSettingsWindow();
+
+        private void OpenAbout(object? sender, EventArgs e) => _settingsService.OpenSettingsWindow(SettingsSection.Info);
+
+        private void AddPathAndOpen(object? sender, EventArgs e)
+        {
+            _settingsService.SelectNewPath();
+            OnIconClick();
+        }
 
         public void OnIconClick()
         {
@@ -50,11 +62,7 @@ namespace DirectoryDash.Services
         private void HandleClick(object? sender, EventArgs e)
         {
             var icon = sender as NotifyIcon;
-            if (e is MouseEventArgs mouseEventArgs && mouseEventArgs.Button == MouseButtons.Right)
-            {
-                HandleRightClick(icon);
-            }
-            else
+            if (e is MouseEventArgs mouseEventArgs && mouseEventArgs.Button == MouseButtons.Left)
             {
                 MainWindow mainWindow = (MainWindow)System.Windows.Application.Current.MainWindow;
                 if (mainWindow != null)
@@ -83,9 +91,5 @@ namespace DirectoryDash.Services
             return (clickPoint.X, clickPoint.Y);
         }
 
-        private void HandleRightClick(NotifyIcon? icon)
-        {
-
-        }
     }
 }

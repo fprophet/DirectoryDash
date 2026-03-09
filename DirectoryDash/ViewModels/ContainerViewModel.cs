@@ -14,7 +14,7 @@ namespace DirectoryDash.ViewModels
     {
         private Func<ExplorerContainerData, ContainerViewModel> _containerVmFactory;
         private ExplorerService _explorerService;
-        private IconService _iconService;
+        private SettingsService _settingsService;
 
         public ContainersStore ContainersStore { get; }
         public ItemListViewModel ItemListViewModel { get; }
@@ -24,7 +24,9 @@ namespace DirectoryDash.ViewModels
 
         [ObservableProperty]
         private ContainerViewModel childContainer;
-        private bool _isLoaded = false;
+
+        [ObservableProperty]
+        private bool isLoading = false;
 
         public ICommand OnContainerClickCommand => new RelayCommand<ExplorerItem>(OnContainerClick);
         public ICommand OnMouseEnterItemCommand => new RelayCommand<ExplorerItem>(OnMouseEnterItem);
@@ -32,7 +34,7 @@ namespace DirectoryDash.ViewModels
 
         public ContainerViewModel(
             ExplorerService explorerService,
-            IconService iconService,
+            SettingsService settingsService,
             ContainersStore containersStore,
             Func<ExplorerContainerData, ContainerViewModel> containerVmFactory,
             ItemListViewModel itemListViewModel,
@@ -40,7 +42,7 @@ namespace DirectoryDash.ViewModels
         {
             _containerVmFactory = containerVmFactory;
             _explorerService = explorerService;
-            _iconService = iconService;
+            _settingsService = settingsService;
             ContainerData = data;
             ContainersStore = containersStore;
             ItemListViewModel = itemListViewModel;
@@ -64,6 +66,7 @@ namespace DirectoryDash.ViewModels
             }
 
             ItemListViewModel.UpdateCollection(ContainerData.Items);
+            IsLoading = false;
         }
 
         private ContainerViewModel CreateContainerNode(string nodePath, bool isPositionedAtStart = false)
@@ -84,11 +87,9 @@ namespace DirectoryDash.ViewModels
         [RelayCommand]
         public async Task OnLoaded()
         {
-            if (_isLoaded) return;
-            _isLoaded = true;
-            InitializeAsync();
-
-            //await _explorerService.StartClear();
+            if (IsLoading) return;
+            IsLoading = true;
+            await InitializeAsync();
         }
 
         [RelayCommand]
@@ -114,27 +115,15 @@ namespace DirectoryDash.ViewModels
         [RelayCommand]
         private void CreateFolder()
         {
-           var path = _explorerService.CreateFolder(ContainerData.ElementPath);
-
-            if (!string.IsNullOrEmpty(path))
-            {
-                var item = _explorerService.GetNode(path);
-                ContainerData.Items.Add(item);
-                ItemListViewModel.Refresh();
-            }
+            var path = _explorerService.CreateFolder(ContainerData.ElementPath);
+            AddItem(path);
         }
 
         [RelayCommand]
         private void CreateTextDoc()
         {
            var path = _explorerService.CreateTextDoc(ContainerData.ElementPath);
-
-            if (!string.IsNullOrEmpty(path))
-            {
-                var item = _explorerService.GetNode(path);
-                ContainerData.Items.Add(item);
-                ItemListViewModel.Refresh();
-            }
+            AddItem(path);
         }
 
         [RelayCommand]
@@ -214,18 +203,35 @@ namespace DirectoryDash.ViewModels
         [RelayCommand]
         public void UnregisterContainer()
         {
+            ContainerData.IsVisible = false;
+
             var found = ContainersStore.AllContainers.FirstOrDefault(x => x.ContainerData.ElementPath == ContainerData.ElementPath);
             if (found != null)
                 ContainersStore.AllContainers.Remove(found);
+            ContainerData.Items.Clear();
 
             if (ChildContainer != null)
             {
                 ChildContainer.UnregisterContainer();
-
                 ChildContainer = null;
             }
+
         }
 
+        [RelayCommand]
+        public void AddNewPath()
+        {
+            var path = _settingsService.SelectNewPath();
+
+            if (string.IsNullOrEmpty(path)) return;
+
+            if( ContainerData.IsPathSelection )
+            {
+                var item = _explorerService.GetNode(path);
+                ContainerData.Items.Add(item);
+                ItemListViewModel.Refresh();
+            }
+        }
 
         private void UnregisterChildContainer()
         {
@@ -258,6 +264,16 @@ namespace DirectoryDash.ViewModels
             else if (isClick)
             {
                 _explorerService.OpenFile(item.FullPath);
+            }
+        }
+
+        private void AddItem(string path)
+        {
+            if (!string.IsNullOrEmpty(path))
+            {
+                var item = _explorerService.GetNode(path);
+                ContainerData.Items.Add(item);
+                ItemListViewModel.Refresh();
             }
         }
     }

@@ -30,6 +30,7 @@ namespace DirectoryDash
             serviceCollection.AddSingleton<IconService>();
             serviceCollection.AddSingleton<SettingsService>();
             serviceCollection.AddSingleton<KeyService>();
+            serviceCollection.AddTransient<DialogBoxService>();
             serviceCollection.AddSingleton<ContainersStore>();
 
             serviceCollection.AddTransient<MainWindow>();

@@ -21,11 +21,12 @@ namespace DirectoryDash.ViewModels
     {
         [ObservableProperty]
         private ContainerViewModel rootContainer;
-
+        private DialogBoxService _dialogBoxService;
         private IconService _iconService;
         private ExplorerService _explorerService;
         private Func<ExplorerContainerData, ContainerViewModel> _containerVmFactory;
         private KeyService _keyService;
+        private SettingsService _settingsService;
 
         public ContainersStore ContainersStore { get; }
 
@@ -49,13 +50,18 @@ namespace DirectoryDash.ViewModels
             ExplorerService explorerService,
             IconService iconService,
             ContainersStore containersStore,
+            SettingsService settingsService,
+            DialogBoxService dialogBoxService,
             KeyService keyService,
             Func<ExplorerContainerData, ContainerViewModel> containerVmFactory)
         {
+            _dialogBoxService = dialogBoxService;
             _iconService = iconService;
             _explorerService = explorerService;
             _containerVmFactory = containerVmFactory;
             _keyService = keyService;
+            _settingsService = settingsService;
+
             ContainersStore = containersStore;
 
             SetSubscribers();
@@ -64,8 +70,14 @@ namespace DirectoryDash.ViewModels
         private void CreateRootContainer()
         {
             var sourceDirectory = SettingsHelper.Settings.SavedPaths.First();
-            RootContainer = _containerVmFactory(new ExplorerContainerData() { ElementPath = sourceDirectory });
+            RootContainer = _containerVmFactory(new ExplorerContainerData() 
+                { 
+                    ElementPath = sourceDirectory, 
+                    ElementName = Path.GetFileName(sourceDirectory),
+                });
         }
+
+        private string AddNewPath() => _settingsService.SelectNewPath();
 
         private void CreateRootSelectionContainer()
         {
@@ -98,11 +110,18 @@ namespace DirectoryDash.ViewModels
         private void IconService_HandleClick(object? sender, EventArgs e)
         {
             ClearView();
-         
-            if( SettingsHelper.Settings.SavedPaths.Count > 1)
+
+            if (SettingsHelper.Settings.SavedPaths.Count == 0)
+            {
+                _dialogBoxService.InfoBox("No saved paths found! Please add a path before starting navigation.");
+                AddNewPath();
+                return;
+            }
+
+            //if (SettingsHelper.Settings.SavedPaths.Count > 1)
                 CreateRootSelectionContainer();
-            else
-                CreateRootContainer();
+            //else
+            //    CreateRootContainer();
 
             if (RootContainer == null) return;
 
@@ -149,7 +168,6 @@ namespace DirectoryDash.ViewModels
         private void ToggleNavigation()
         {
             ContainersStore.NavigationBlocked = !ContainersStore.NavigationBlocked;
-
         }
     }
 }

@@ -19,7 +19,7 @@
             <i:InvokeCommandAction Command="{Binding KeyUpCommand}" PassEventArgsToCommand="True" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
-    <Grid>
+    <Grid VerticalAlignment="Stretch">
 
         <Grid x:Name="Modal" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Panel.ZIndex="1111"
                   Focusable="True"
@@ -35,18 +35,22 @@
         
         
         <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <Grid Margin="24">
+            <Grid Margin="24,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <TextBlock Text="General Settings"
-                       FontSize="22"
-                       FontWeight="SemiBold"
-                       Foreground="White"
-                       Margin="0,0,0,16"/>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                    <material:PackIcon Kind="Cog" Width="24" Height="24" Margin="0,0,10,0"
+                                   VerticalAlignment="Center" Foreground="White"/>
+                    <TextBlock Text="General Settings" VerticalAlignment="Center"
+                         FontSize="22"
+                         FontWeight="SemiBold"
+                         Foreground="White"
+                         Margin="0,0,0,0"/>
+                </StackPanel>
 
                 <Border Background="#FF2A2A2A" Grid.Row="1"
                     CornerRadius="8"

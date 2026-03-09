@@ -4,10 +4,128 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:DirectoryDash.Views.SettingsViews"
+             xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-        <TextBlock Text="Info Settings"/>
+    <Grid VerticalAlignment="Stretch">
 
+            <Grid Margin="24,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                <material:PackIcon Kind="InformationOutline" Width="24" Height="24" Margin="0,0,10,0"
+                                   VerticalAlignment="Center" Foreground="White"/>
+                <TextBlock Text="About" VerticalAlignment="Center"
+                     FontSize="22"
+                     FontWeight="SemiBold"
+                     Foreground="White"
+                     Margin="0,0,0,0"/>
+            </StackPanel>
+
+            <Border Background="#FF2A2A2A"
+        Grid.Row="1"
+        CornerRadius="8"
+        Padding="20">
+
+                <StackPanel>
+
+                    <TextBlock TextWrapping="Wrap"
+                       FontSize="14"
+                       Foreground="#DDFFFFFF"
+                       Margin="0,0,0,18">
+                        DirectoryDash is a lightweight desktop utility designed to make navigating files and folders faster. 
+                        Instead of opening File Explorer and searching through directories, you can access your most important 
+                        locations instantly from the system tray.
+                    </TextBlock>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                        <material:PackIcon Kind="StarFourPointsOutline"
+                               Width="18"
+                               Height="18"
+                               Margin="0,0,8,0"
+                               Foreground="#FF4FC3F7"/>
+                        <TextBlock Text="Key Features"
+                       FontSize="15"
+                       FontWeight="SemiBold"
+                       Foreground="White"/>
+                    </StackPanel>
+
+                    <StackPanel Margin="6,0,0,0">
+
+                        <StackPanel Orientation="Horizontal" Margin="0,4">
+                            <material:PackIcon Kind="Tray"
+                                   Width="16"
+                                   Height="16"
+                                   Margin="0,0,8,0"
+                                   Foreground="#FF90CAF9"/>
+                            <TextBlock Foreground="#DDFFFFFF" TextWrapping="Wrap">
+                                Open the main navigation container directly from the system tray icon.
+                            </TextBlock>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,4">
+                            <material:PackIcon Kind="FolderStar"
+                                   Width="16"
+                                   Height="16"
+                                   Margin="0,0,8,0"
+                                   Foreground="#FF90CAF9"/>
+                            <TextBlock Foreground="#DDFFFFFF" TextWrapping="Wrap">
+                                Add and manage custom paths from anywhere on your computer.
+                            </TextBlock>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,4">
+                            <material:PackIcon Kind="Mouse"
+                                   Width="16"
+                                   Height="16"
+                                   Margin="0,0,8,0"
+                                   Foreground="#FF90CAF9"/>
+                            <TextBlock Foreground="#DDFFFFFF" TextWrapping="Wrap">
+                                Navigate items by clicking or hovering, depending on your preferred workflow.
+                            </TextBlock>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,4">
+                            <material:PackIcon Kind="ViewColumnOutline"
+                                   Width="16"
+                                   Height="16"
+                                   Margin="0,0,8,0"
+                                   Foreground="#FF90CAF9"/>
+                            <TextBlock Foreground="#DDFFFFFF" TextWrapping="Wrap">
+                                Cascading containers open beside each other for fast multi-level directory navigation.
+                            </TextBlock>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,4">
+                            <material:PackIcon Kind="Magnify"
+                                   Width="16"
+                                   Height="16"
+                                   Margin="0,0,8,0"
+                                   Foreground="#FF90CAF9"/>
+                            <TextBlock Foreground="#DDFFFFFF" TextWrapping="Wrap">
+                                Search inside opened folders and quickly create new folders or files.
+                            </TextBlock>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,4">
+                            <material:PackIcon Kind="DotsHorizontalCircleOutline"
+                                   Width="16"
+                                   Height="16"
+                                   Margin="0,0,8,0"
+                                   Foreground="#FF90CAF9"/>
+                            <TextBlock Foreground="#DDFFFFFF" TextWrapping="Wrap">
+                                Right-click any item to copy path, copy file, rename, delete, or open properties.
+                            </TextBlock>
+                        </StackPanel>
+
+                    </StackPanel>
+
+                </StackPanel>
+            </Border>
+        </Grid>
     </Grid>
 </UserControl>
