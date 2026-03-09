@@ -23,10 +23,12 @@ namespace DirectoryDash.Services
         public Action Clear { get; internal set; }
 
         private CancellationTokenSource _clearViewCT = new CancellationTokenSource();
+        private DialogBoxService _dialogBoxService;
         private ContainersStore _containersStore;
 
-        public ExplorerService(ContainersStore containersStore)
+        public ExplorerService(ContainersStore containersStore, DialogBoxService dialogBoxService)
         {
+            _dialogBoxService = dialogBoxService;
             _containersStore = containersStore;
         }
 
@@ -64,7 +66,6 @@ namespace DirectoryDash.Services
             }
             catch (Exception ex)
             {
-                // Handle exceptions (e.g., log them)
                 Trace.WriteLine($"Error accessing path: {ex.Message}");
                 return new List<ExplorerItem>();
             }
@@ -81,12 +82,20 @@ namespace DirectoryDash.Services
 
         public void GetIconsForNodes(List<ExplorerItem> nodes)
         {
-            foreach (var node in nodes)
+            try
             {
-                var icon = FileIconHelper.GetSmallIcon(node.FullPath);
-                var imageSource = IconToImageSource(icon);
-                imageSource.Freeze();
-                node.Icon = imageSource;
+
+                foreach (var node in nodes)
+                {
+                    var icon = FileIconHelper.GetSmallIcon(node.FullPath);
+                    var imageSource = IconToImageSource(icon);
+                    imageSource.Freeze();
+                    node.Icon = imageSource;
+                }
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine($"Error accessing icon for path: {ex.Message}");
             }
         }
 
@@ -180,7 +189,6 @@ namespace DirectoryDash.Services
             });
         }
 
-
         //implement error handling and error messages
         internal bool DeleteItem(string path)
         {
@@ -224,16 +232,35 @@ namespace DirectoryDash.Services
 
         private bool DeleteFile(string path)
         {
-            var confirmation = System.Windows.MessageBox.Show("Are you sure you want to delete this file?", "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-            if (confirmation == MessageBoxResult.Yes)
+            var confirmation = _dialogBoxService.WarningConfirmation("Are you sure you want to delete this file?");
+            try
             {
-                FileSystem.DeleteFile(
-                    path,
-                    UIOption.OnlyErrorDialogs,
-                    RecycleOption.SendToRecycleBin
-                );
+                if (confirmation == MessageBoxResult.Yes)
+                {
+                    FileSystem.DeleteFile(
+                        path,
+                        UIOption.OnlyErrorDialogs,
+                        RecycleOption.SendToRecycleBin
+                    );
 
-                return true;
+                    return true;
+                }
+            }
+            catch (UnauthorizedAccessException ex) 
+            {
+                _dialogBoxService.ErrorBox("Application does not have permission to delete this file.");
+            }
+            catch (IOException ex)
+            {
+                _dialogBoxService.ErrorBox("File is in use by another proces.");
+            }
+            catch(ArgumentException ex)
+            {
+                _dialogBoxService.ErrorBox("Invalid path!");
+            }
+            catch(NotSupportedException ex)
+            {
+                _dialogBoxService.ErrorBox("Path is in an invalid format.");
             }
 
             return false;
