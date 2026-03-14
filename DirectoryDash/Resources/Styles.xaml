@@ -53,7 +53,8 @@
         <Setter Property="Tag" Value="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ListView}}"/>
         <Setter Property="ContextMenu">
             <Setter.Value>
-                <ContextMenu Placement="MousePoint"
+                <ContextMenu Focusable="False" IsHitTestVisible="False" Placement="MousePoint" 
+                        IsOpen="{Binding PlacementTarget.Tag.IsItemContextMenuOpened, RelativeSource={RelativeSource Self}}"
                         DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
                     
                     <MenuItem Header="Open"
@@ -135,8 +136,9 @@
 
                 <Setter Property="ContextMenu">
                     <Setter.Value>
-                        <ContextMenu
-                        DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
+                        <ContextMenu Focusable="False" IsHitTestVisible="False"
+                            IsOpen="{Binding PlacementTarget.Tag.IsItemContextMenuOpened, RelativeSource={RelativeSource Self}}"
+                            DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
                             <MenuItem Header="Open"
                                    Command="{Binding OpenInExplorerCommand}"
                                    CommandParameter="{Binding PlacementTarget.DataContext.FullPath,

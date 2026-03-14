@@ -1,14 +1,16 @@
 ﻿using DirectoryDash.Models;
-using System.Windows.Input;
+using Microsoft.Win32;
+using System.Diagnostics;
 using System.IO;
 using System.Text.Json;      
+using System.Windows.Input;
 
 
 namespace DirectoryDash.Helpers
 {
     internal class SettingsHelper
     {
-        public static readonly string Directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "DirectoryDash");
+        public static readonly string Directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), Vars.AppName);
         public static readonly string SettingsFile = Path.Combine(Directory, "settings.json");
 
         public static Settings Settings { get; private set; } = new Settings();
@@ -61,18 +63,20 @@ namespace DirectoryDash.Helpers
 
         private static void CreateDefaultSettings()
         {
-            var settings = new Models.Settings()
+            Settings = new Models.Settings()
             {
                 SavedPaths = new List<string>() { Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) },
                 OnStartup = true,
                 DirectoriesOnly = false
             };
 
-            File.WriteAllText(SettingsFile, JsonSerializer.Serialize(settings));
+            SaveSettings();
         }
 
         public static void SaveSettings()
         {
+            SetStartup(Settings.OnStartup);
+
             File.WriteAllText(SettingsFile, JsonSerializer.Serialize(Settings));
         }
 
@@ -91,6 +95,23 @@ namespace DirectoryDash.Helpers
         {
             Settings.SavedPaths.Remove(path);
             SaveSettings();
+        }
+
+        public static void SetStartup(bool enable)
+        {
+            string exePath = Environment.ProcessPath!;
+
+            using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(
+                @"Software\Microsoft\Windows\CurrentVersion\Run", true);
+
+            if (enable)
+            {
+                key.SetValue(Vars.AppName, $"\"{exePath}\" /startup");
+            }
+            else
+            {
+                key.DeleteValue(Vars.AppName, false);
+            }
         }
     }
 }

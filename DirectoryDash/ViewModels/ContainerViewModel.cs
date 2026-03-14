@@ -28,6 +28,13 @@ namespace DirectoryDash.ViewModels
         [ObservableProperty]
         private bool isLoading = false;
 
+        //this is needed to prevent mouse leave from triggering
+        //when oppening a context menu
+        [ObservableProperty]
+        private bool isItemContextMenuOpened = false;
+        [ObservableProperty]
+        private bool isContainerContextMenuOpened = false;
+
         public ICommand OnContainerClickCommand => new RelayCommand<ExplorerItem>(OnContainerClick);
         public ICommand OnMouseEnterItemCommand => new RelayCommand<ExplorerItem>(OnMouseEnterItem);
         public ICommand OnLoadedCommand => new AsyncRelayCommand(OnLoaded);

@@ -55,7 +55,6 @@ namespace DirectoryDash
             window.DataContext = mainViewModel;
             window.Show();
 
-
             base.OnStartup(e);
         }
 

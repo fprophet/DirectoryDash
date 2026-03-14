@@ -15,7 +15,7 @@ namespace DirectoryDash.Models
         public List<string> savedPaths = new List<string>();
 
         [ObservableProperty]
-        public bool onStartup = true;
+        public bool onStartup = false;
 
         [ObservableProperty]
         public bool directoriesOnly = false;

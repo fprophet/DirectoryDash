@@ -32,6 +32,8 @@ namespace DirectoryDash.Helpers
         
         public static double ContainerHorMargin { get; set; } = 20;
 
+        public const string AppName = "DirectoryDash";
+
         internal static void Reset()
         {
             Vars.DirectionChanged = false;

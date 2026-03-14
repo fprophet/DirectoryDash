@@ -1,18 +1,8 @@
 ﻿using DirectoryDash.Enums;
 using DirectoryDash.Factories;
 using DirectoryDash.Helpers;
-using DirectoryDash.SettingsViewModels.ViewModels;
-using DirectoryDash.ViewModels;
-using DirectoryDash.Views;
-using DirectoryDash.Views.SettingsViews;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Forms; // Add this using directive at the top
+using System.Reflection;
 
 namespace DirectoryDash.Services
 {
@@ -31,9 +21,20 @@ namespace DirectoryDash.Services
         {
             _settingsService = settingsService;
             _itemFactory = itemFactory;
-
+            
             _icon = new NotifyIcon();
-            _icon.Icon = new Icon("Resources/tray.ico");
+
+            try
+            {
+                Stream iconStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("DirectoryDash.Resources.tray.ico");
+                _icon.Icon = new Icon(iconStream);
+            }
+            catch
+            (Exception ex) 
+            {
+                throw new Exception($"Error loading icon: {ex.Message}");
+            }
+
             _icon.Visible = true;
             _icon.Click += HandleClick;
             _icon.ContextMenuStrip = new ContextMenuStrip();
@@ -44,6 +45,7 @@ namespace DirectoryDash.Services
             _icon.ContextMenuStrip.Items.Add("Exit", GetImage("exit.png"), CloseApp);
             _icon.ContextMenuStrip.Show();
         }
+
 
         private void CloseApp(object? sender, EventArgs e) => System.Windows.Application.Current.Shutdown();
 

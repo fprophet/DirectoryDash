@@ -132,15 +132,14 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
-                        <!--<TextBlock Text="Your saved paths" Foreground="White" VerticalAlignment="Center"/>-->
                         <Button Style="{StaticResource MaterialDesignToolButton}"
                              Width="36" Height="36"
                              ToolTip="Menu" HorizontalAlignment="Left"
-                             behaviors:LeftClickContextMenuBehavior.OpenOnLeftClick="True"
+                             behaviors:LeftClickContextMenuBehavior.OpenOnLeftClick="True" Tag="{Binding}"
                              ContextMenuService.IsEnabled="True">
                             <material:PackIcon Kind="Menu" Foreground="White"/>
                             <Button.ContextMenu>
-                                <ContextMenu>
+                                <ContextMenu IsOpen="{Binding PlacementTarget.Tag.IsContainerContextMenuOpened, RelativeSource={RelativeSource Self}}">
                                     <MenuItem Header="Add Navigation Path" Command="{Binding AddNewPathCommand}"  >
                                         <MenuItem.Icon>
                                             <material:PackIcon Kind="FolderPlusOutline" />
@@ -173,12 +172,12 @@
 
                             <Button Style="{StaticResource MaterialDesignToolButton}"
                                 Width="36" Height="36"
-                                ToolTip="Menu"
+                                ToolTip="Menu" Tag="{Binding}"
                                 behaviors:LeftClickContextMenuBehavior.OpenOnLeftClick="True"
                                 ContextMenuService.IsEnabled="True">
                                 <material:PackIcon Kind="Menu" Foreground="White"/>
                                 <Button.ContextMenu>
-                                    <ContextMenu>
+                                    <ContextMenu IsOpen="{Binding PlacementTarget.Tag.IsContainerContextMenuOpened, RelativeSource={RelativeSource Self}}">
                                         <MenuItem Header="New Folder" Command="{Binding CreateFolderCommand}"  >
                                             <MenuItem.Icon>
                                                 <material:PackIcon Kind="FolderPlusOutline" />
@@ -212,11 +211,18 @@
                             </Button>
                         </Grid>
 
-                            <TextBox Text="{Binding ItemListViewModel.SearchText, UpdateSourceTrigger=PropertyChanged}" material:HintAssist.Hint="{Binding ContainerData.ElementName}"
-                                         VerticalAlignment="Center" Grid.Column="1" Foreground="White"
-                                         HorizontalAlignment="Stretch" Style="{StaticResource MaterialDesignTextBox}"/>
-                            
-                                <Button Style="{StaticResource MaterialDesignToolButton}"
+                            <TextBox Text="{Binding ItemListViewModel.SearchText, UpdateSourceTrigger=PropertyChanged}"
+                                VerticalAlignment="Center" Grid.Column="1" Foreground="White"
+                                         HorizontalAlignment="Stretch" Style="{StaticResource MaterialDesignTextBox}">
+                                <material:HintAssist.Hint>
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <material:PackIcon Kind="Magnify" Width="16" Height="16" Margin="0,0,6,0"/>
+                                        <TextBlock Text="{Binding ContainerData.ElementName}"/>
+                                    </StackPanel>
+                                </material:HintAssist.Hint>
+                            </TextBox>
+
+                            <Button Style="{StaticResource MaterialDesignToolButton}"
                                         Command="{Binding UnregisterContainerCommand}"
                                         Grid.Column="2" HorizontalAlignment="Right"
                                         ToolTip="Close">

@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -120,10 +121,19 @@ namespace DirectoryDash.Services
             {
                 if (!SettingsHelper.Settings.ClearViewOnLeave) return;
 
+                //open context menus will trigger the MouseLeave command
+                var contextMenuOpened = _containersStore.AllContainers.Any(x => x.IsContainerContextMenuOpened || x.IsItemContextMenuOpened);
+                if (contextMenuOpened) return;
+
+                if (System.Windows.Application.Current.Windows.OfType<ContextMenu>().Any(cm => cm.IsOpen))
+                    return;
+
                 var delay = SettingsHelper.Settings.ClearViewDelay;
 
                 _clearViewCT = new CancellationTokenSource();
+
                 await Task.Delay(delay, _clearViewCT.Token);
+
                 if (!_clearViewCT.IsCancellationRequested)
                     ClearView();
             }

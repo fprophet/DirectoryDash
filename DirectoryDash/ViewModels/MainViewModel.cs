@@ -19,8 +19,6 @@ namespace DirectoryDash.ViewModels
 
     internal partial class MainViewModel : BaseViewModel
     {
-        [ObservableProperty]
-        private ContainerViewModel rootContainer;
         private DialogBoxService _dialogBoxService;
         private IconService _iconService;
         private ExplorerService _explorerService;
@@ -29,6 +27,9 @@ namespace DirectoryDash.ViewModels
         private SettingsService _settingsService;
 
         public ContainersStore ContainersStore { get; }
+
+        [ObservableProperty]
+        private ContainerViewModel rootContainer;
 
         [ObservableProperty]
         private bool isListVisible = false;
